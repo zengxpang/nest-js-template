@@ -13,6 +13,7 @@ import { InvokeRecordInterceptor } from './invoke-record.interceptor';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CatModule } from './cat/cat.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { CatModule } from './cat/cat.module';
       inject: [ConfigService],
     }),
     CatModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [
