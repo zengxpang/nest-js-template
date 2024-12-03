@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { utilities, WinstonModule } from 'nest-winston';
 import 'winston-daily-rotate-file';
+import { CustomPrismaModule } from 'nestjs-prisma';
 
 import { CustomExceptionFilter } from './custom-exception.filter';
 import { FormatResponseInterceptor } from './format-response.interceptor';
@@ -14,6 +15,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CatModule } from './cat/cat.module';
 import { EmailModule } from './email/email.module';
+import { ExtendedPrismaConfigService } from './prisma/extended-prisma-config.service';
 
 @Module({
   imports: [
@@ -41,6 +43,10 @@ import { EmailModule } from './email/email.module';
         ],
       }),
       inject: [ConfigService],
+    }),
+    CustomPrismaModule.forRootAsync({
+      name: 'PrismaService',
+      useClass: ExtendedPrismaConfigService,
     }),
     CatModule,
     EmailModule,
