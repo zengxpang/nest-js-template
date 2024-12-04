@@ -16,6 +16,7 @@ import { AppService } from './app.service';
 import { CatModule } from './cat/cat.module';
 import { EmailModule } from './email/email.module';
 import { ExtendedPrismaConfigService } from './prisma/extended-prisma-config.service';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { ExtendedPrismaConfigService } from './prisma/extended-prisma-config.ser
     }),
     CatModule,
     EmailModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [
