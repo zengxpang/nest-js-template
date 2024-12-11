@@ -9,16 +9,25 @@ import {
 } from '@nestjs/swagger';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
+import { getSystemConfig } from '@/common';
+
 import { AppModule } from './app.module';
 import metadata from './metadata';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
-
-  // http://localhost:3000/static/${filename}
-  app.useStaticAssets('public', { prefix: '/static' });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    bufferLogs: true,
+  });
 
   const configService = app.get(ConfigService);
+  const systemConfig = getSystemConfig(configService);
+
+  // 全局前缀
+  app.setGlobalPrefix(systemConfig.NEST_PREFIX);
+
+  // static静态服务
+  // http://localhost:3000/static/${filename}
+  app.useStaticAssets('public', { prefix: '/static' });
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -26,28 +35,30 @@ async function bootstrap() {
     }),
   );
 
+  // winston
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
   // swagger
-  const config = new DocumentBuilder()
-    .setTitle('epros-mermaid')
-    .setDescription('epros-mermaid API')
-    .setVersion('1.0')
+  const title = systemConfig.SWAGGER_TITLE;
+  const description = systemConfig.SWAGGER_DESCRIPTION;
+  const version = systemConfig.SWAGGER_VERSION;
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle(title)
+    .setDescription(description)
+    .setVersion(version)
+    .addBearerAuth()
     .build();
 
   await SwaggerModule.loadPluginMetadata(metadata);
   const options: SwaggerDocumentOptions = {
     operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
   };
-  const document = SwaggerModule.createDocument(app, config, options);
+  const document = SwaggerModule.createDocument(app, swaggerConfig, options);
   SwaggerModule.setup('/api', app, document, {
     jsonDocumentUrl: '/api-json',
   });
 
-  await app.listen(
-    configService.get<IMermaidPlatformConfig['NEST_SERVER_PORT']>(
-      'NEST_SERVER_PORT',
-    ),
-  );
+  // nest
+  await app.listen(systemConfig.NEST_PORT);
 }
 bootstrap();

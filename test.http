@@ -1,0 +1,18 @@
+GET {{host}}/auth/check
+Accept: application/json
+
+###
+GET {{host}}/cat
+Accept: application/json
+
+###
+POST {{host}}/auth/jwtLogin
+Content-Type: application/json
+
+{
+  "username": "zxp",
+  "password": "123456"
+}
+
+###
+
