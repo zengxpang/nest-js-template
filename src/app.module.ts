@@ -7,8 +7,9 @@ import {
   utilities as nestWinstonModuleUtilities,
   WinstonModule,
 } from 'nest-winston';
-import 'winston-daily-rotate-file';
 import { CustomPrismaModule } from 'nestjs-prisma';
+import path from 'path';
+import DailyRotateFile from 'winston-daily-rotate-file';
 
 import {
   CustomExceptionFilter,
@@ -24,8 +25,6 @@ import { EmailModule } from './email/email.module';
 import { ExtendedPrismaConfigService } from './prisma/extended-prisma-config.service';
 import { RedisModule } from './redis/redis.module';
 import { AuthModule } from './auth/auth.module';
-import path from 'path';
-import DailyRotateFile from 'winston-daily-rotate-file';
 
 @Module({
   imports: [
@@ -53,8 +52,10 @@ import DailyRotateFile from 'winston-daily-rotate-file';
             winston.format.timestamp(),
             winston.format.ms(),
             nestWinstonModuleUtilities.format.nestLike('MyApp', {
+              // colors: true, 会导致出现乱码
               prettyPrint: true,
-              colors: true,
+              processId: true,
+              appName: true,
             }),
             winston.format.errors({ stack: true }),
           ),

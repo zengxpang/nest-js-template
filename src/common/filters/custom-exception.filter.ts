@@ -14,7 +14,7 @@ export class CustomExceptionFilter implements ExceptionFilter {
     // 设置状态码 此时其实已经是 400 了，但是response 里的可能是 201
     response.statusCode = exception.getStatus();
 
-    const res = exception.getResponse() as IKeyValue;
+    const res = exception.getResponse() as Share.IKeyValue;
     const messages: string[] = res?.message; // 针对 class-validator 的错误信息
 
     response

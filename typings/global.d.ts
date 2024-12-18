@@ -1,5 +1,7 @@
 declare global {
-  type IKeyValue = Record<string, any>;
+  namespace Share {
+    type IKeyValue = Record<string, any>;
+  }
   namespace Auth {
     //
   }
