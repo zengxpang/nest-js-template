@@ -1,29 +1,36 @@
 import { ConfigService } from '@nestjs/config';
 
 interface ISystemConfig {
-  readonly NEST_PREFIX: string;
-  readonly NEST_PORT: number;
+  NEST_PREFIX: string;
+  NEST_PORT: number;
 
-  readonly DEFAULT_ADMIN_USERNAME: string;
-  readonly DEFAULT_ADMIN_PASSWORD: string;
-  readonly DEFAULT_ADMIN_ROLE: string;
-  readonly DEFAULT_ADMIN_PERMISSION: string;
+  DEFAULT_ADMIN_USERNAME: string;
+  DEFAULT_ADMIN_PASSWORD: string;
+  DEFAULT_ADMIN_ROLE: string;
+  DEFAULT_ADMIN_PERMISSION: string;
 
-  readonly SWAGGER_TITLE: string;
-  readonly SWAGGER_DESCRIPTION: string;
-  readonly SWAGGER_VERSION: string;
+  SWAGGER_TITLE: string;
+  SWAGGER_DESCRIPTION: string;
+  SWAGGER_VERSION: string;
 
-  readonly WINSTON_LOG_LEVEL: string;
-  readonly WINSTON_LOG_DIRNAME: string;
-  readonly WINSTON_LOG_MAX_FILES: string;
-  readonly WINSTON_LOG_DATE_PATTERN: string;
-  readonly WINSTON_LOG_MAX_SIZE: string;
+  WINSTON_LOG_LEVEL: string;
+  WINSTON_LOG_DIRNAME: string;
+  WINSTON_LOG_MAX_FILES: string;
+  WINSTON_LOG_DATE_PATTERN: string;
+  WINSTON_LOG_MAX_SIZE: string;
+
+  JWT_ACCESS_SECRET: string;
+  JWT_REFRESH_SECRET: string;
+  JWT_ACCESS_TOKEN_EXPIRES_IN: string;
+  JWT_REFRESH_TOKEN_EXPIRES_IN: string;
+
+  REDIS_URL: string;
   // todo
 }
 
 export const getSystemConfig = (
   configService: ConfigService,
-): ISystemConfig => {
+): Readonly<ISystemConfig> => {
   return {
     NEST_PREFIX: configService.get<string>('NEST_PREFIX') || '/api/v1',
     NEST_PORT: configService.get<number>('NEST_PORT') || 3000,
@@ -50,5 +57,17 @@ export const getSystemConfig = (
       configService.get<string>('WINSTON_LOG_DATE_PATTERN') || 'YYYY-MM-DD',
     WINSTON_LOG_MAX_SIZE:
       configService.get<string>('WINSTON_LOG_MAX_SIZE') || '20m',
+
+    JWT_ACCESS_SECRET:
+      configService.get<string>('JWT_ACCESS_SECRET') || 'access zxp',
+    JWT_REFRESH_SECRET:
+      configService.get<string>('JWT_REFRESH_SECRET') || 'refresh zxp',
+    JWT_ACCESS_TOKEN_EXPIRES_IN:
+      configService.get<string>('JWT_ACCESS_TOKEN_EXPIRES_IN') || '1d',
+    JWT_REFRESH_TOKEN_EXPIRES_IN:
+      configService.get<string>('JWT_REFRESH_TOKEN_EXPIRES_IN') || '7d',
+
+    REDIS_URL:
+      configService.get<string>('REDIS_URL') || 'redis://localhost:6379',
   };
 };

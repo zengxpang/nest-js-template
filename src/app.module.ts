@@ -2,7 +2,7 @@ import * as winston from 'winston';
 
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import {
   utilities as nestWinstonModuleUtilities,
   WinstonModule,
@@ -23,8 +23,11 @@ import { AppService } from './app.service';
 import { CatModule } from './cat/cat.module';
 import { EmailModule } from './email/email.module';
 import { ExtendedPrismaConfigService } from './prisma/extended-prisma-config.service';
-import { RedisModule } from './redis/redis.module';
 import { AuthModule } from './auth/auth.module';
+import { CaptchaModule } from './captcha/captcha.module';
+import { UserModule } from './user/user.module';
+import { RedisModule } from '@nestjs-modules/ioredis';
+import { JwtAuthGuard } from '@/auth/guards';
 
 @Module({
   imports: [
@@ -104,10 +107,18 @@ import { AuthModule } from './auth/auth.module';
       isGlobal: true,
       useClass: ExtendedPrismaConfigService,
     }),
+    RedisModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        type: 'single',
+        url: getSystemConfig(configService).REDIS_URL,
+      }),
+      inject: [ConfigService],
+    }),
     CatModule,
     EmailModule,
-    RedisModule,
     AuthModule,
+    CaptchaModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [
@@ -123,6 +134,10 @@ import { AuthModule } from './auth/auth.module';
     {
       provide: APP_FILTER,
       useClass: CustomExceptionFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
     },
   ],
 })

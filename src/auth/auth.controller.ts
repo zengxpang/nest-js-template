@@ -4,19 +4,18 @@ import {
   Get,
   Inject,
   Post,
-  Req,
-  Res,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { ReqUser } from '@/common';
-
-import { JwtSign, Payload } from './auth.interface';
-import { AuthService } from './auth.service';
-import { JwtVerifyGuard, LocalAuthGuard } from '@/auth/guards';
 import { IsPublic } from '@/common';
+import { JwtVerifyGuard, LocalAuthGuard } from '@/auth/guards';
 
+import { AuthService } from './auth.service';
+
+@ApiTags('权限')
 @Controller('auth')
 export class AuthController {
   @Inject(AuthService)
@@ -25,29 +24,24 @@ export class AuthController {
   /**
    * 用户登陆
    */
+  @IsPublic() // JwtAuthGuard设置为全局守卫了，所以这里需要设置为公开接口
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@ReqUser() user: Payload): Promise<Payload> {
-    return user;
-  }
-
-  @UseGuards(LocalAuthGuard)
-  @Post('jwtLogin')
-  jwtLogin(@ReqUser() user: Payload): JwtSign {
+  login(@ReqUser() user: Auth.IPayload): Auth.IJwtSign {
     return this.authService.jwtSign(user);
   }
 
-  // 只执行verify，不检查accessToken的过期时间。
+  @IsPublic()
   @UseGuards(JwtVerifyGuard)
-  @Post('jwtRefresh')
-  jwtRefresh(
-    @ReqUser() user: Payload,
+  @Post('refreshToken')
+  // 只执行verify，不检查access_token的过期时间
+  refreshToken(
+    @ReqUser() user: Auth.IPayload,
     @Body('refreshToken') refreshToken: string,
-  ): JwtSign {
+  ): Auth.IJwtSign {
     if (!this.authService.validateRefreshToken(user, refreshToken)) {
       throw new UnauthorizedException('刷新token无效');
     }
-
     return this.authService.jwtSign(user);
   }
 }

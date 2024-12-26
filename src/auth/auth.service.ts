@@ -2,23 +2,18 @@ import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { CustomPrismaService } from 'nestjs-prisma';
 import { JwtService } from '@nestjs/jwt';
 import { omit } from 'lodash';
-import { User } from '@prisma/client';
 import { isEmpty } from 'lodash';
-
-import { md5 } from '@/common/utils';
-import { ExtendedPrismaClient } from '@/prisma/prisma.extension';
 import { ConfigService } from '@nestjs/config';
+import { ExtendedPrismaClient } from '@/prisma/prisma.extension';
 
-import { JwtPayload, Payload } from './auth.interface';
+import { getSystemConfig } from '@/common';
 
 @Injectable()
 export class AuthService {
   @Inject('PrismaService')
   private readonly prismaService: CustomPrismaService<ExtendedPrismaClient>;
-
   @Inject(JwtService)
   private readonly jwtService: JwtService;
-
   @Inject(ConfigService)
   private readonly configService: ConfigService;
 
@@ -31,51 +26,51 @@ export class AuthService {
     if (isEmpty(user)) {
       throw new BadRequestException('用户不存在');
     }
-    // if (md5(password) !== user.password) {
-    //   throw new BadRequestException('密码错误');
-    // }
+
+    // const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (password !== user.password) {
       throw new BadRequestException('密码错误');
     }
+
     return omit(user, ['password']);
   }
 
-  jwtSign(payload: Payload) {
-    const jwtPayload: JwtPayload = {
-      sub: payload.userId,
-      username: payload.username,
-      email: payload.email,
-    };
-
+  jwtSign(payload: Auth.IPayload): Auth.IJwtSign {
     return {
-      accessToken: this.jwtService.sign(jwtPayload),
-      refreshToken: this.getRefreshToken(jwtPayload.sub),
+      accessToken: this.jwtService.sign(payload),
+      refreshToken: this.getRefreshToken(payload.userId),
     };
   }
 
-  getRefreshToken(sub: string): string {
+  getRefreshToken(userId: string): string {
+    const systemConfig = getSystemConfig(this.configService);
     return this.jwtService.sign(
-      { sub },
+      { userId },
       {
-        secret: this.configService.get('jwtRefreshSecret'),
-        expiresIn: '7d',
+        secret: systemConfig['JWT_REFRESH_SECRET'],
+        expiresIn: systemConfig['JWT_REFRESH_TOKEN_EXPIRES_IN'],
       },
     );
   }
 
-  validateRefreshToken(payload: Payload, refreshToken: string): boolean {
-    if (
-      !this.jwtService.verify(refreshToken, {
-        secret: this.configService.get('jwtRefreshSecret'),
-      })
-    ) {
-      return false;
-    }
+  validateRefreshToken(payload: Auth.IPayload, refreshToken: string): boolean {
+    const systemConfig = getSystemConfig(this.configService);
+    try {
+      if (
+        !this.jwtService.verify(refreshToken, {
+          secret: systemConfig['JWT_REFRESH_SECRET'],
+        })
+      ) {
+        return false;
+      }
+      const refreshPayload = this.jwtService.decode<{ userId: string }>(
+        refreshToken,
+      );
 
-    const refreshPayload = this.jwtService.decode<{ sub: string }>(
-      refreshToken,
-    );
-    return refreshPayload.sub === payload.userId;
+      return refreshPayload.userId === payload.userId;
+    } catch (e) {
+      console.log(e);
+    }
   }
 }
