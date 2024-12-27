@@ -106,11 +106,11 @@ export class AuthService {
   jwtSign(payload: Auth.IPayload): Auth.IJwtSign {
     return {
       accessToken: this.jwtService.sign(payload),
-      refreshToken: this.getRefreshToken(payload.userId),
+      refreshToken: this.createRefreshToken(payload.userId),
     };
   }
 
-  getRefreshToken(userId: string): string {
+  createRefreshToken(userId: string): string {
     const systemConfig = getSystemConfig(this.configService);
     return this.jwtService.sign(
       { userId },
@@ -127,6 +127,11 @@ export class AuthService {
   ): boolean {
     const systemConfig = getSystemConfig(this.configService);
     const { refreshToken } = refreshDto;
+    console.log(
+      this.jwtService.verify(refreshToken, {
+        secret: systemConfig.JWT_REFRESH_SECRET,
+      }),
+    );
     try {
       if (
         !this.jwtService.verify(refreshToken, {
@@ -138,6 +143,7 @@ export class AuthService {
       const refreshPayload = this.jwtService.decode<{ userId: string }>(
         refreshToken,
       );
+      console.log(refreshPayload);
 
       return refreshPayload.userId === payload.userId;
     } catch (e) {

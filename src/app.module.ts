@@ -83,16 +83,16 @@ import { RedisModule } from './redis/redis.module';
               level: 'error',
             }),
           ],
-          exceptionHandlers: [
-            new DailyRotateFile({
-              dirname: path.join(dirname, 'exceptions'),
-              filename: 'exceptions-%DATE%.log',
-              datePattern,
-              zippedArchive: true,
-              maxSize,
-              maxFiles,
-            }),
-          ],
+          // exceptionHandlers: [
+          //   new DailyRotateFile({
+          //     dirname: path.join(dirname, 'exceptions'),
+          //     filename: 'exceptions-%DATE%.log',
+          //     datePattern,
+          //     zippedArchive: true,
+          //     maxSize,
+          //     maxFiles,
+          //   }),
+          // ],
         };
       },
       inject: [ConfigService],
