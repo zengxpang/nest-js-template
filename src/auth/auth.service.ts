@@ -7,10 +7,9 @@ import { ExtendedPrismaClient } from '@/prisma/prisma.extension';
 import * as svgCaptcha from 'svg-captcha';
 
 import { getSystemConfig } from '@/common';
-import { LoginDto } from '@/auth/dto/login.dto';
+import { LoginDto, RefreshTokenDto } from '@/auth/dto';
 import { RedisService } from '@/redis/redis.service';
 import { UserService } from '@/user/user.service';
-import { RefreshTokenDto } from '@/auth/dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -116,8 +115,8 @@ export class AuthService {
     return this.jwtService.sign(
       { userId },
       {
-        secret: systemConfig['JWT_REFRESH_SECRET'],
-        expiresIn: systemConfig['JWT_REFRESH_TOKEN_EXPIRES_IN'],
+        secret: systemConfig.JWT_REFRESH_SECRET,
+        expiresIn: systemConfig.JWT_REFRESH_TOKEN_EXPIRES_IN,
       },
     );
   }
@@ -131,7 +130,7 @@ export class AuthService {
     try {
       if (
         !this.jwtService.verify(refreshToken, {
-          secret: systemConfig['JWT_REFRESH_SECRET'],
+          secret: systemConfig.JWT_REFRESH_SECRET,
         })
       ) {
         return false;

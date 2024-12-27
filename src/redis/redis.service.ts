@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
 import { createHash } from 'crypto';
+
 import { getSystemConfig } from '@/common';
 import { ConfigService } from '@nestjs/config';
 

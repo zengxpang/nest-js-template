@@ -13,7 +13,7 @@ export class JwtVerifyStrategy extends PassportStrategy(Strategy, JWT_VERIFY) {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       // 在处理refreshToken时不检查accessToken的过期时间。
       ignoreExpiration: true,
-      secretOrKey: systemConfig['JWT_REFRESH_SECRET'],
+      secretOrKey: systemConfig.JWT_REFRESH_SECRET,
     });
   }
 

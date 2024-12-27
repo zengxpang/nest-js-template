@@ -4,11 +4,11 @@ import { PassportModule } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 
 import { getSystemConfig } from '@/common';
+import { UserModule } from '@/user/user.module';
 
 import { JwtStrategy, JwtVerifyStrategy } from './strategies';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { UserModule } from '@/user/user.module';
 
 @Global()
 @Module({
@@ -20,9 +20,9 @@ import { UserModule } from '@/user/user.module';
       useFactory: (configService: ConfigService) => {
         const systemConfig = getSystemConfig(configService);
         return {
-          secret: systemConfig['JWT_ACCESS_SECRET'],
+          secret: systemConfig.JWT_ACCESS_SECRET,
           signOptions: {
-            expiresIn: systemConfig['JWT_ACCESS_TOKEN_EXPIRES_IN'],
+            expiresIn: systemConfig.JWT_ACCESS_TOKEN_EXPIRES_IN,
           },
         };
       },
@@ -30,6 +30,5 @@ import { UserModule } from '@/user/user.module';
     }),
   ],
   providers: [AuthService, JwtStrategy, JwtVerifyStrategy],
-  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

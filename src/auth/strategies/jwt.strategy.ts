@@ -18,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT) {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       // 路由提供了一个过期的 JWT，请求将被拒绝，并发送一个 401 Unauthorized 响应
       ignoreExpiration: false,
-      secretOrKey: systemConfig['JWT_ACCESS_SECRET'],
+      secretOrKey: systemConfig.JWT_ACCESS_SECRET,
       passReqToCallback: true, // 设置为true，validate的第一个参数才是request
     });
   }
@@ -31,7 +31,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT) {
       throw new UnauthorizedException('请重新登录');
     }
 
-    // 用户不存在或账号已被禁用
+    //todo 用户不存在或账号已被禁用
 
     return payload;
   }
