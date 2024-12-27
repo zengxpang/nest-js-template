@@ -59,7 +59,7 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOkResponse()
   @Post('logout')
-  logout(@Headers('authorization') accessToken: string) {
+  logout(@Headers('Authorization') accessToken: string) {
     return this.authService.logout(accessToken.split(' ')[1]);
   }
 

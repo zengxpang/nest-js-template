@@ -1,36 +1,17 @@
 import { HttpStatus } from '@nestjs/common';
-import { ApiProperty } from '@nestjs/swagger';
 
 export class FormatResponseEntity<T = unknown> {
-  // statusCode?: HttpStatus = 200;
-  //
-  // data?: T;
-  //
-  // message?: string = 'success';
+  statusCode?: HttpStatus = 200;
 
-  @ApiProperty({ default: 200 })
-  statusCode: HttpStatus;
-
-  @ApiProperty()
   data?: T;
 
-  @ApiProperty({ default: 'Success' })
-  message: string;
+  message?: string = 'success';
 }
 
 export class NullResponseEntity implements FormatResponseEntity<string> {
-  // statusCode?: HttpStatus = 200;
-  //
-  // data?: string = null;
-  //
-  // message?: string = 'success';
+  statusCode?: HttpStatus = 200;
 
-  @ApiProperty({ default: 200 })
-  statusCode: HttpStatus;
+  data?: string = null;
 
-  @ApiProperty({ default: null })
-  data?: string;
-
-  @ApiProperty({ default: 'Success' })
-  message: string;
+  message?: string = 'success';
 }

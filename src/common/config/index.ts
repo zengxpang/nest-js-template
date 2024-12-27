@@ -21,7 +21,7 @@ interface ISystemConfig {
 
   JWT_ACCESS_SECRET: string;
   JWT_REFRESH_SECRET: string;
-  JWT_ACCESS_TOKEN_EXPIRES_IN: string;
+  JWT_ACCESS_TOKEN_EXPIRES_IN: number;
   JWT_REFRESH_TOKEN_EXPIRES_IN: string;
 
   REDIS_URL: string;
@@ -67,7 +67,7 @@ export const getSystemConfig = (
     JWT_REFRESH_SECRET:
       configService.get<string>('JWT_REFRESH_SECRET') || 'refresh zxp',
     JWT_ACCESS_TOKEN_EXPIRES_IN:
-      configService.get<string>('JWT_ACCESS_TOKEN_EXPIRES_IN') || '1d',
+      +configService.get<number>('JWT_ACCESS_TOKEN_EXPIRES_IN') || 1800,
     JWT_REFRESH_TOKEN_EXPIRES_IN:
       configService.get<string>('JWT_REFRESH_TOKEN_EXPIRES_IN') || '7d',
 
