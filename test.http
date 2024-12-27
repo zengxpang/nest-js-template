@@ -1,3 +1,18 @@
+### 生成验证码
+GET {{host}}/auth/createCaptcha
+Accept: application/json
+
+### 登陆
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "sAdmin",
+  "password": "sAdmin",
+  "captcha": "1Mhe"
+}
+
+### 刷新token
 POST {{host}}/auth/refreshToken
 Content-Type: application/json
 Authorization: Bearer {{refreshToken}}
@@ -5,34 +20,4 @@ Authorization: Bearer {{refreshToken}}
 {
   "refreshToken": "{{refreshToken}}"
 }
-
-###
-POST {{host}}/auth/
-Content-Type: application/json
-
-{}
-
-###
-GET {{host}}/captcha/createCaptcha
-Accept: application/json
-
-###
-GET {{host}}/auth/profile
-Accept: application/json
-Authorization: Bearer {{token}}
-
-###
-GET {{host}}/cat
-Accept: application/json
-
-###
-POST {{host}}/auth/login
-Content-Type: application/json
-
-{
-  "username": "sAdmin",
-  "password": "sAdmin"
-}
-
-###
 

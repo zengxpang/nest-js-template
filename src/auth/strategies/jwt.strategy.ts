@@ -3,16 +3,15 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
-import { InjectRedis } from '@nestjs-modules/ioredis';
-import Redis from 'ioredis';
 
-import { getSystemConfig, JWT, getBlackListKey } from '@/common';
+import { getSystemConfig, JWT } from '@/common';
+import { RedisService } from '@/redis/redis.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, JWT) {
   constructor(
     configService: ConfigService,
-    @InjectRedis() private readonly redis: Redis,
+    private readonly redisService: RedisService,
   ) {
     const systemConfig = getSystemConfig(configService);
     super({
@@ -26,16 +25,14 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT) {
 
   // fromAuthHeaderAsBearerToken 从request的header中提取token,然后从token中取出payload之后会传入validate方法做验证，验证通过后会将payload放入req.user中
   async validate(req: Request, payload: Auth.IPayload): Promise<Auth.IPayload> {
-    // const token = req.headers.authorization.split(' ')[1];
-    // const blackListKey = getBlackListKey(token);
-    // const isBlackListed = await this.redis.exists(blackListKey);
-    //
-    // if (isBlackListed) {
-    //   throw new UnauthorizedException('token失效');
-    // }
-    return {
-      userId: payload.userId,
-      username: payload.username,
-    };
+    const token = req.headers.authorization.split(' ')[1];
+    const isBlackListed = await this.redisService.isBlackListed(token);
+    if (isBlackListed) {
+      throw new UnauthorizedException('请重新登录');
+    }
+
+    // 用户不存在或账号已被禁用
+
+    return payload;
   }
 }

@@ -25,6 +25,10 @@ interface ISystemConfig {
   JWT_REFRESH_TOKEN_EXPIRES_IN: string;
 
   REDIS_URL: string;
+
+  CAPTCHA_EXPIRES_IN: number;
+  SIGN_IN_ERROR_EXPIRE_IN: number;
+  SIGN_IN_ERROR_LIMIT: number;
   // todo
 }
 
@@ -33,7 +37,7 @@ export const getSystemConfig = (
 ): Readonly<ISystemConfig> => {
   return {
     NEST_PREFIX: configService.get<string>('NEST_PREFIX') || '/api/v1',
-    NEST_PORT: configService.get<number>('NEST_PORT') || 3000,
+    NEST_PORT: +configService.get<number>('NEST_PORT') || 3000,
 
     DEFAULT_ADMIN_USERNAME:
       configService.get<string>('DEFAULT_ADMIN_USERNAME') || 'sAdmin',
@@ -69,5 +73,10 @@ export const getSystemConfig = (
 
     REDIS_URL:
       configService.get<string>('REDIS_URL') || 'redis://localhost:6379',
+
+    CAPTCHA_EXPIRES_IN: +configService.get<number>('CAPTCHA_EXPIRES_IN') || 300,
+    SIGN_IN_ERROR_EXPIRE_IN:
+      +configService.get<number>('SIGN_IN_ERROR_EXPIRE_IN') || 300,
+    SIGN_IN_ERROR_LIMIT: +configService.get<number>('SIGN_IN_ERROR_LIMIT') || 5,
   };
 };

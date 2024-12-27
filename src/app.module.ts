@@ -17,17 +17,14 @@ import {
   getSystemConfig,
   InvokeRecordInterceptor,
 } from '@/common';
+import { JwtAuthGuard } from '@/auth/guards';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { CatModule } from './cat/cat.module';
 import { EmailModule } from './email/email.module';
 import { ExtendedPrismaConfigService } from './prisma/extended-prisma-config.service';
 import { AuthModule } from './auth/auth.module';
-import { CaptchaModule } from './captcha/captcha.module';
 import { UserModule } from './user/user.module';
-import { RedisModule } from '@nestjs-modules/ioredis';
-import { JwtAuthGuard } from '@/auth/guards';
+
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -107,22 +104,12 @@ import { JwtAuthGuard } from '@/auth/guards';
       isGlobal: true,
       useClass: ExtendedPrismaConfigService,
     }),
-    RedisModule.forRootAsync({
-      useFactory: (configService: ConfigService) => ({
-        type: 'single',
-        url: getSystemConfig(configService).REDIS_URL,
-      }),
-      inject: [ConfigService],
-    }),
-    CatModule,
     EmailModule,
     AuthModule,
-    CaptchaModule,
     UserModule,
+    RedisModule,
   ],
-  controllers: [AppController],
   providers: [
-    AppService,
     {
       provide: APP_INTERCEPTOR,
       useClass: FormatResponseInterceptor,

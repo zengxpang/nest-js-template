@@ -10,9 +10,9 @@ export class LoginDto {
   /**
    * 密码
    */
-  @Matches(/^[a-zA-Z](?=.*[.?!&_])(?=.*\d)[a-zA-Z\d.?!&_]{5,15}$/, {
-    message: '密码格式错误',
-  })
+  // @Matches(/^[a-zA-Z](?=.*[.?!&_])(?=.*\d)[a-zA-Z\d.?!&_]{5,15}$/, {
+  //   message: '密码格式错误',
+  // })
   @IsNotEmpty({ message: '密码不能为空' })
   password: string;
 
