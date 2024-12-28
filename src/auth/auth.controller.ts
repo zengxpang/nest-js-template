@@ -4,10 +4,9 @@ import {
   Inject,
   Ip,
   Post,
-  UnauthorizedException,
-  UseGuards,
   Headers,
   Get,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -18,7 +17,6 @@ import {
 
 import { ReqUser } from '@/common';
 import { IsPublic } from '@/common';
-import { JwtVerifyGuard } from '@/auth/guards';
 import { LoginEntity, CaptchaEntity } from '@/auth/entities';
 import { LoginDto, RefreshTokenDto } from '@/auth/dto';
 
@@ -29,6 +27,11 @@ import { AuthService } from './auth.service';
 export class AuthController {
   @Inject(AuthService)
   private readonly authService: AuthService;
+
+  @Get('hello')
+  hello() {
+    return 'hello';
+  }
 
   @ApiOperation({ summary: '获取验证码' })
   @ApiOkResponse({
@@ -68,16 +71,16 @@ export class AuthController {
   @ApiOkResponse({
     type: LoginEntity,
   })
-  @UseGuards(JwtVerifyGuard)
+  @IsPublic() // accessToken过期后，需要使用refreshToken来刷新token，所以这里设置为公开接口
   @Post('refreshToken')
-  // 只执行verify，不检查access_token的过期时间
   refreshToken(
-    @ReqUser() user: Auth.IPayload,
+    @Headers('Authorization') accessToken: string,
     @Body() refreshDto: RefreshTokenDto,
-  ): Auth.IJwtSign {
-    if (!this.authService.validateRefreshToken(user, refreshDto)) {
-      throw new UnauthorizedException('刷新token无效');
+  ): Promise<LoginEntity> {
+    if (!accessToken) {
+      throw new BadRequestException('请求头中必须包含Authorization属性');
     }
-    return this.authService.jwtSign(user);
+
+    return this.authService.refreshToken(accessToken.split(' ')[1], refreshDto);
   }
 }

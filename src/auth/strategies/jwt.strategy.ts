@@ -6,12 +6,14 @@ import { Request } from 'express';
 
 import { getSystemConfig, JWT } from '@/common';
 import { RedisService } from '@/redis/redis.service';
+import { AuthService } from '@/auth/auth.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, JWT) {
   constructor(
     configService: ConfigService,
     private readonly redisService: RedisService,
+    private readonly authService: AuthService,
   ) {
     const systemConfig = getSystemConfig(configService);
     super({
@@ -31,7 +33,15 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT) {
       throw new UnauthorizedException('请重新登录');
     }
 
-    //todo 用户不存在或账号已被禁用
+    // 防止账号被禁用或者删除之后，还能进行操作
+    const isValidUser = await this.authService.validateUser(
+      payload.username,
+      undefined,
+      false,
+    );
+    if (!isValidUser) {
+      throw new UnauthorizedException('用户不存在或账号已被禁用');
+    }
 
     return payload;
   }

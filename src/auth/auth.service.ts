@@ -5,11 +5,13 @@ import { isEmpty, toLower } from 'lodash';
 import { ConfigService } from '@nestjs/config';
 import { ExtendedPrismaClient } from '@/prisma/prisma.extension';
 import * as svgCaptcha from 'svg-captcha';
+import { compare } from 'bcrypt';
 
 import { getSystemConfig } from '@/common';
 import { LoginDto, RefreshTokenDto } from '@/auth/dto';
 import { RedisService } from '@/redis/redis.service';
 import { UserService } from '@/user/user.service';
+import { LoginEntity } from '@/auth/entities';
 
 @Injectable()
 export class AuthService {
@@ -65,7 +67,7 @@ export class AuthService {
       this.redisService.setSignInErrors(signInErrorsKey, signInErrors + 1);
       throw new BadRequestException('用户名或密码错误, 或账号已被禁用');
     }
-    return this.jwtSign(payload);
+    return this.createTokens(payload);
   }
 
   async logout(accessToken: string) {
@@ -74,14 +76,23 @@ export class AuthService {
 
   async validateUser(
     username: string,
-    password: string,
+    password: string | undefined,
+    isValidatePwd = true, // 默认为true,是否需要验证密码
   ): Promise<Auth.IPayload | false> {
     const user = await this.userService.findUser(username);
 
     if (isEmpty(user) || user.disabled) {
       return false;
     }
-    // const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (isValidatePwd === false) {
+      return {
+        userId: user.id,
+        username: user.username,
+      };
+    }
+
+    // const isPasswordValid = await compare(password, user.password);
 
     if (password !== user.password) {
       return false;
@@ -103,51 +114,47 @@ export class AuthService {
     return false;
   }
 
-  jwtSign(payload: Auth.IPayload): Auth.IJwtSign {
+  createTokens(payload: Auth.IPayload): Auth.IJwtSign {
+    const systemConfig = getSystemConfig(this.configService);
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: systemConfig.JWT_ACCESS_TOKEN_EXPIRES_IN,
+    });
+    const refreshToken = this.jwtService.sign(payload, {
+      expiresIn: systemConfig.JWT_REFRESH_TOKEN_EXPIRES_IN,
+    });
     return {
-      accessToken: this.jwtService.sign(payload),
-      refreshToken: this.createRefreshToken(payload.userId),
+      accessToken,
+      refreshToken,
     };
   }
 
-  createRefreshToken(userId: string): string {
-    const systemConfig = getSystemConfig(this.configService);
-    return this.jwtService.sign(
-      { userId },
-      {
-        secret: systemConfig.JWT_REFRESH_SECRET,
-        expiresIn: systemConfig.JWT_REFRESH_TOKEN_EXPIRES_IN,
-      },
-    );
-  }
-
-  validateRefreshToken(
-    payload: Auth.IPayload,
+  async refreshToken(
+    accessToken: string,
     refreshDto: RefreshTokenDto,
-  ): boolean {
-    const systemConfig = getSystemConfig(this.configService);
+  ): Promise<LoginEntity> {
     const { refreshToken } = refreshDto;
-    console.log(
-      this.jwtService.verify(refreshToken, {
-        secret: systemConfig.JWT_REFRESH_SECRET,
-      }),
-    );
-    try {
-      if (
-        !this.jwtService.verify(refreshToken, {
-          secret: systemConfig.JWT_REFRESH_SECRET,
-        })
-      ) {
-        return false;
-      }
-      const refreshPayload = this.jwtService.decode<{ userId: string }>(
-        refreshToken,
-      );
-      console.log(refreshPayload);
-
-      return refreshPayload.userId === payload.userId;
-    } catch (e) {
-      console.log(e);
+    const isBlackListed = await this.redisService.isBlackListed(accessToken);
+    if (isBlackListed) {
+      throw new BadRequestException('请重新登录');
     }
+    let payload: Auth.IPayload;
+
+    try {
+      const { userId, username } = this.jwtService.verify(refreshToken);
+      payload = { userId, username };
+    } catch {
+      throw new BadRequestException('请重新登录');
+    }
+
+    const isValidUser = await this.validateUser(
+      payload.username,
+      undefined,
+      false,
+    );
+    if (!isValidUser) {
+      throw new BadRequestException('用户不存在或账号已被禁用');
+    }
+
+    return this.createTokens(payload);
   }
 }
