@@ -1,13 +1,17 @@
+POST {{host}}/auth/logout
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{}
+
+###
+
+
+###
 GET {{host}}/auth/userPermissions
 Accept: application/json
-Authorization: Bearer {{token}}
 
-###
-GET {{host}}/user/xx?id=cm5epamo800006mbp7xjqjmt2
-Accept: application/json
-Authorization: Bearer {{token}}
 
-###
 ### 生成验证码
 GET {{host}}/auth/createCaptcha
 Accept: application/json

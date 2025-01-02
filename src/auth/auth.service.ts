@@ -4,25 +4,24 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import { CustomPrismaService } from 'nestjs-prisma';
 import { JwtService } from '@nestjs/jwt';
 import { filter, head, isEmpty, size, split, toLower, map } from 'lodash';
 import { ConfigService } from '@nestjs/config';
-import { ExtendedPrismaClient } from '@/prisma/prisma.extension';
 import * as svgCaptcha from 'svg-captcha';
 import { compare } from 'bcrypt';
 
 import { createMenus, getSystemConfig } from '@/common';
-import { LoginDto, RefreshTokenDto } from '@/auth/dto';
+
 import { RedisService } from '@/redis/redis.service';
 import { UserService } from '@/user/user.service';
-import { LoginEntity } from '@/auth/entities';
 import { UserInfoEntity } from '@/auth/entities/user-info.entity';
+
+import { LoginEntity } from './entities/login.entity';
+import { LoginDto } from './dto/login.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
-  @Inject('PrismaService')
-  private readonly prismaService: CustomPrismaService<ExtendedPrismaClient>;
   @Inject(JwtService)
   private readonly jwtService: JwtService;
   @Inject(ConfigService)

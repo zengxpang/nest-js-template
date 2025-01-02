@@ -10,12 +10,13 @@ import DailyRotateFile from 'winston-daily-rotate-file';
 import * as winston from 'winston';
 import path from 'path';
 
-import { JwtAuthGuard } from '@/auth/guards';
 import {
   CustomExceptionFilter,
   FormatResponseInterceptor,
   getSystemConfig,
   InvokeRecordInterceptor,
+  AuthorityGuard,
+  JwtAuthGuard,
 } from '@/common';
 
 import { EmailModule } from './email/email.module';
@@ -125,6 +126,10 @@ import { PermissionModule } from './permission/permission.module';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthorityGuard,
     },
   ],
 })

@@ -15,9 +15,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { IsPublic, ReqUser } from '@/common';
-import { LoginEntity, CaptchaEntity, UserInfoEntity } from '@/auth/entities';
-import { LoginDto, RefreshTokenDto } from '@/auth/dto';
+import { Authority, IsPublic, ReqUser } from '@/common';
+
+import { LoginEntity } from './entities/login.entity';
+import { CaptchaEntity } from './entities/captcha.entity';
+import { UserInfoEntity } from './entities/user-info.entity';
+import { LoginDto } from './dto/login.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 import { AuthService } from './auth.service';
 
@@ -55,6 +59,7 @@ export class AuthController {
   @ApiOperation({ summary: '登出' })
   @ApiBearerAuth()
   @ApiOkResponse()
+  @Authority('user:logout')
   @Post('logout')
   logout(@Headers('Authorization') accessToken: string) {
     return this.authService.logout(accessToken.split(' ')[1]);
