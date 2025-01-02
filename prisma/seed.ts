@@ -177,7 +177,6 @@ async function main() {
   });
 
   const username = process.env.DEFAULT_ADMIN_USERNAME;
-  // 加密密码
   const password = await hash(
     process.env.DEFAULT_ADMIN_PASSWORD,
     +process.env.BCRYPT_SALT_ROUNDS,
@@ -201,6 +200,29 @@ async function main() {
     update: {},
     where: {
       username,
+    },
+  });
+
+  const username2 = 'zengxpang';
+  const password2 = await hash('123456', +process.env.BCRYPT_SALT_ROUNDS);
+  await prisma.user.upsert({
+    create: {
+      username: username2,
+      password: password2,
+      profile: {
+        create: {
+          nickname: '超级管理员2',
+        },
+      },
+      roleInUser: {
+        create: {
+          roleId: role.id,
+        },
+      },
+    },
+    update: {},
+    where: {
+      username: username2,
     },
   });
 }

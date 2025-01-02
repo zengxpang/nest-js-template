@@ -1,3 +1,13 @@
+GET {{host}}/auth/userPermissions
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+GET {{host}}/user/xx?id=cm5epamo800006mbp7xjqjmt2
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
 ### 生成验证码
 GET {{host}}/auth/createCaptcha
 Accept: application/json
@@ -7,17 +17,8 @@ POST {{host}}/auth/login
 Content-Type: application/json
 
 {
-  "username": "sAdmin",
-  "password": "sAdmin",
-  "captcha": "1Mhe"
-}
-
-### 刷新token
-POST {{host}}/auth/refreshToken
-Content-Type: application/json
-Authorization: Bearer {{refreshToken}}
-
-{
-  "refreshToken": "{{refreshToken}}"
+  "username": "zengxpang",
+  "password": "123456",
+  "captcha": "dQmE"
 }
 

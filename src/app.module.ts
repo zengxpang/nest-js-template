@@ -23,6 +23,7 @@ import { ExtendedPrismaConfigService } from './prisma/extended-prisma-config.ser
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { RedisModule } from './redis/redis.module';
+import { PermissionModule } from './permission/permission.module';
 
 @Module({
   imports: [
@@ -106,6 +107,7 @@ import { RedisModule } from './redis/redis.module';
     AuthModule,
     UserModule,
     RedisModule,
+    PermissionModule,
   ],
   providers: [
     {

@@ -15,9 +15,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { ReqUser } from '@/common';
-import { IsPublic } from '@/common';
-import { LoginEntity, CaptchaEntity } from '@/auth/entities';
+import { IsPublic, ReqUser } from '@/common';
+import { LoginEntity, CaptchaEntity, UserInfoEntity } from '@/auth/entities';
 import { LoginDto, RefreshTokenDto } from '@/auth/dto';
 
 import { AuthService } from './auth.service';
@@ -27,11 +26,6 @@ import { AuthService } from './auth.service';
 export class AuthController {
   @Inject(AuthService)
   private readonly authService: AuthService;
-
-  @Get('hello')
-  hello() {
-    return 'hello';
-  }
 
   @ApiOperation({ summary: '获取验证码' })
   @ApiOkResponse({
@@ -82,5 +76,15 @@ export class AuthController {
     }
 
     return this.authService.refreshToken(accessToken.split(' ')[1], refreshDto);
+  }
+
+  @ApiOperation({ summary: '获取用户信息' })
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    type: UserInfoEntity,
+  })
+  @Get('userPermissions')
+  getUserInfo(@ReqUser('userId') userId: string) {
+    return this.authService.getUserInfo(userId);
   }
 }

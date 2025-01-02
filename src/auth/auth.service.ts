@@ -1,17 +1,23 @@
-import { Injectable, Inject, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CustomPrismaService } from 'nestjs-prisma';
 import { JwtService } from '@nestjs/jwt';
-import { isEmpty, toLower } from 'lodash';
+import { filter, head, isEmpty, size, split, toLower, map } from 'lodash';
 import { ConfigService } from '@nestjs/config';
 import { ExtendedPrismaClient } from '@/prisma/prisma.extension';
 import * as svgCaptcha from 'svg-captcha';
 import { compare } from 'bcrypt';
 
-import { getSystemConfig } from '@/common';
+import { createMenus, getSystemConfig } from '@/common';
 import { LoginDto, RefreshTokenDto } from '@/auth/dto';
 import { RedisService } from '@/redis/redis.service';
 import { UserService } from '@/user/user.service';
 import { LoginEntity } from '@/auth/entities';
+import { UserInfoEntity } from '@/auth/entities/user-info.entity';
 
 @Injectable()
 export class AuthService {
@@ -92,9 +98,9 @@ export class AuthService {
       };
     }
 
-    // const isPasswordValid = await compare(password, user.password);
+    const isPasswordValid = await compare(password, user.password);
 
-    if (password !== user.password) {
+    if (!isPasswordValid) {
       return false;
     }
 
@@ -156,5 +162,44 @@ export class AuthService {
     }
 
     return this.createTokens(payload);
+  }
+
+  async getUserInfo(useId: string) {
+    const userPermissionInfo =
+      await this.userService.findUserPermissionInfo(useId);
+    if (size(userPermissionInfo) === 0) {
+      throw new NotFoundException('用户不存在或账号已被禁用');
+    }
+
+    const userPermissionInfoItem = head(userPermissionInfo);
+    const userAuthInfo: UserInfoEntity = {
+      nickname: userPermissionInfoItem.nickname,
+      username: userPermissionInfoItem.username,
+      avatar: userPermissionInfoItem.avatar,
+      roles: split(userPermissionInfoItem.role_names, ','),
+      permissions: [],
+      menus: [],
+    };
+
+    if (size(userAuthInfo.roles) === 0) {
+      return userAuthInfo;
+    }
+
+    const systemConfig = getSystemConfig(this.configService);
+    const isDefaultAdmin =
+      userPermissionInfoItem.username === systemConfig.DEFAULT_ADMIN_USERNAME;
+    userAuthInfo.permissions = isDefaultAdmin
+      ? [systemConfig.DEFAULT_ADMIN_PERMISSION]
+      : map(filter(userPermissionInfo, 'permission'), 'permission');
+
+    this.redisService.setUserPermission(useId, userAuthInfo.permissions);
+
+    const menus = filter(
+      userPermissionInfo,
+      (item) => item.type && item.type !== 'BUTTON',
+    );
+    userAuthInfo.menus = createMenus(menus);
+
+    return userAuthInfo;
   }
 }

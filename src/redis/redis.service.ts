@@ -83,4 +83,27 @@ export class RedisService {
     const has = await this.redis.exists(key);
     return !!has;
   }
+
+  createUserPermissionKey(id: string) {
+    return `permission: ${id}`;
+  }
+
+  getUserPermission(id: string) {
+    const key = this.createUserPermissionKey(id);
+    return this.redis.smembers(key);
+  }
+
+  setUserPermission(id: string, permissions: string[]) {
+    const key = this.createUserPermissionKey(id);
+    this.redis.sadd(key, permissions);
+    this.redis.expire(
+      key,
+      getSystemConfig(this.configService).JWT_ACCESS_TOKEN_EXPIRES_IN,
+    );
+  }
+
+  delUserPermission(id: string) {
+    const key = this.createUserPermissionKey(id);
+    this.redis.del(key);
+  }
 }
