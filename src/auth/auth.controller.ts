@@ -8,14 +8,9 @@ import {
   Get,
   BadRequestException,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOkResponse,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { Authority, IsPublic, ReqUser } from '@/common';
+import { Authority, IsPublic, ReqUser, ApiFormatResponse } from '@/common';
 
 import { LoginEntity } from './entities/login.entity';
 import { CaptchaEntity } from './entities/captcha.entity';
@@ -32,9 +27,7 @@ export class AuthController {
   private readonly authService: AuthService;
 
   @ApiOperation({ summary: '获取验证码' })
-  @ApiOkResponse({
-    type: CaptchaEntity,
-  })
+  @ApiFormatResponse(CaptchaEntity)
   @IsPublic()
   @Get('createCaptcha')
   getCaptcha(@Ip() ip: string, @Headers('user-agent') userAgent: string) {
@@ -42,9 +35,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: '登录' })
-  @ApiOkResponse({
-    type: LoginEntity,
-  })
+  @ApiFormatResponse(LoginEntity)
   // JwtAuthGuard设置为全局守卫了，所以这里需要设置为公开接口
   @IsPublic()
   @Post('login')
@@ -58,7 +49,7 @@ export class AuthController {
 
   @ApiOperation({ summary: '登出' })
   @ApiBearerAuth()
-  @ApiOkResponse()
+  @ApiFormatResponse()
   @Authority('user:logout')
   @Post('logout')
   logout(@Headers('Authorization') accessToken: string) {
@@ -67,9 +58,7 @@ export class AuthController {
 
   @ApiOperation({ summary: '刷新token' })
   @ApiBearerAuth()
-  @ApiOkResponse({
-    type: LoginEntity,
-  })
+  @ApiFormatResponse(LoginEntity)
   @IsPublic() // accessToken过期后，需要使用refreshToken来刷新token，所以这里设置为公开接口
   @Post('refreshToken')
   refreshToken(
@@ -85,9 +74,7 @@ export class AuthController {
 
   @ApiOperation({ summary: '获取用户信息' })
   @ApiBearerAuth()
-  @ApiOkResponse({
-    type: UserInfoEntity,
-  })
+  @ApiFormatResponse(UserInfoEntity)
   @Get('userPermissions')
   getUserInfo(@ReqUser('userId') userId: string) {
     return this.authService.getUserInfo(userId);
