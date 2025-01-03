@@ -15,9 +15,10 @@ export class LoginDto {
   /**
    * 密码
    */
-  // @Matches(/^[a-zA-Z](?=.*[.?!&_])(?=.*\d)[a-zA-Z\d.?!&_]{5,15}$/, {
-  //   message: '密码格式错误',
-  // })
+  @Matches(/^\w{6,18}$/, {
+    // 字符串必须包含 6 到 18 个字母、数字或下划线
+    message: '密码格式错误',
+  })
   @IsNotEmpty({
     message: i18nValidationMessage<I18nTranslations>('validate.login.1'),
   })
