@@ -75,7 +75,7 @@ export class AuthController {
   @ApiOperation({ summary: '获取用户信息' })
   @ApiBearerAuth()
   @ApiFormatResponse(UserInfoEntity)
-  @Get('userPermissions')
+  @Get('getUserInfo')
   getUserInfo(@ReqUser('userId') userId: string) {
     return this.authService.getUserInfo(userId);
   }
