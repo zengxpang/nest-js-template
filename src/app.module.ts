@@ -7,8 +7,14 @@ import {
   WinstonModule,
 } from 'nest-winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
+import {
+  AcceptLanguageResolver,
+  HeaderResolver,
+  I18nModule,
+  QueryResolver,
+} from 'nestjs-i18n';
 import * as winston from 'winston';
-import path from 'path';
+import * as path from 'path';
 
 import {
   CustomExceptionFilter,
@@ -25,6 +31,8 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { RedisModule } from './redis/redis.module';
 import { PermissionModule } from './permission/permission.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -104,6 +112,25 @@ import { PermissionModule } from './permission/permission.module';
       isGlobal: true,
       useClass: ExtendedPrismaConfigService,
     }),
+    I18nModule.forRootAsync({
+      useFactory: (configService: ConfigService) => {
+        const systemConfig = getSystemConfig(configService);
+        return {
+          fallbackLanguage: systemConfig.FALLBACK_LANGUAGE,
+          throwOnMissingKey: true,
+          loaderOptions: {
+            path: path.join(__dirname, '/i18n/'),
+            watch: true,
+          },
+          typesOutputPath: path.join(
+            __dirname,
+            '../src/generated/i18n.generated.ts',
+          ),
+        };
+      },
+      resolvers: [AcceptLanguageResolver, new HeaderResolver(['x-lang'])],
+      inject: [ConfigService],
+    }),
     EmailModule,
     AuthModule,
     UserModule,
@@ -111,6 +138,7 @@ import { PermissionModule } from './permission/permission.module';
     PermissionModule,
   ],
   providers: [
+    AppService,
     {
       provide: APP_INTERCEPTOR,
       useClass: FormatResponseInterceptor,
@@ -132,5 +160,6 @@ import { PermissionModule } from './permission/permission.module';
       useClass: AuthorityGuard,
     },
   ],
+  controllers: [AppController],
 })
 export class AppModule {}

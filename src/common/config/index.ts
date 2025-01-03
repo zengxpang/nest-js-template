@@ -29,6 +29,8 @@ interface ISystemConfig {
   CAPTCHA_EXPIRES_IN: number;
   SIGN_IN_ERROR_EXPIRE_IN: number;
   SIGN_IN_ERROR_LIMIT: number;
+
+  FALLBACK_LANGUAGE: string;
   // todo
 }
 
@@ -78,5 +80,7 @@ export const getSystemConfig = (
     SIGN_IN_ERROR_EXPIRE_IN:
       +configService.get<number>('SIGN_IN_ERROR_EXPIRE_IN') || 300,
     SIGN_IN_ERROR_LIMIT: +configService.get<number>('SIGN_IN_ERROR_LIMIT') || 5,
+
+    FALLBACK_LANGUAGE: configService.get<string>('FALLBACK_LANGUAGE') || 'zh',
   };
 };

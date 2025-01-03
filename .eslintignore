@@ -1,0 +1,11 @@
+i18n.generated.ts
+
+node_modules
+
+dist
+
+logs
+
+.idea
+
+pnpm-lock.yaml

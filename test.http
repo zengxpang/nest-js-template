@@ -1,3 +1,13 @@
+GET {{host}}/app/hello
+Accept: application/json
+x-lang: zh
+
+###
+GET {{host}}/app/name
+Accept: application/json
+x-lang: en
+
+###
 POST {{host}}/auth/logout
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -19,9 +29,9 @@ Accept: application/json
 ### 登陆
 POST {{host}}/auth/login
 Content-Type: application/json
+x-lang: zh
 
 {
-  "username": "zengxpang",
   "password": "123456",
   "captcha": "dQmE"
 }

@@ -1,0 +1,7 @@
+{
+  "login": [
+    "The username cannot be empty",
+    "The password cannot be empty",
+    "The captcha cannot be empty"
+  ]
+}
