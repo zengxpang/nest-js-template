@@ -18,26 +18,30 @@ async function main() {
 
   await prisma.permission.upsert({
     create: {
-      name: '系统管理',
-      path: 'system',
+      name: 'function',
+      path: '/function',
       type: 'DIRECTORY',
-      icon: 'system',
-      roleInPermission: {
+      i18n_key: 'route.function',
+      component: 'layout.base',
+      icon: 'icon-park-outline:all-application',
+      order: 6,
+      role_in_permission: {
         create: {
-          roleId: role.id,
+          role_id: role.id,
         },
       },
       children: {
         create: [
           {
-            name: '用户管理',
-            path: 'user',
-            icon: 'user',
-            component: '/system/user/index.tsx',
-            cache: true,
-            roleInPermission: {
+            name: 'function_event-bus',
+            path: 'event-bus',
+            component: 'view.function_event-bus',
+            i18n_key: 'route.function_event-bus',
+            title: 'function_event-bus',
+            icon: 'ant-design:send-outlined',
+            role_in_permission: {
               create: {
-                roleId: role.id,
+                role_id: role.id,
               },
             },
             children: {
@@ -45,30 +49,30 @@ async function main() {
                 {
                   name: '添加用户',
                   type: 'BUTTON',
-                  permission: 'system:user:create',
-                  roleInPermission: {
+                  button: 'system:user:create',
+                  role_in_permission: {
                     create: {
-                      roleId: role.id,
+                      role_id: role.id,
                     },
                   },
                 },
                 {
                   name: '编辑用户',
                   type: 'BUTTON',
-                  permission: 'system:user:edit',
-                  roleInPermission: {
+                  button: 'system:user:edit',
+                  role_in_permission: {
                     create: {
-                      roleId: role.id,
+                      role_id: role.id,
                     },
                   },
                 },
                 {
                   name: '删除用户',
                   type: 'BUTTON',
-                  permission: 'system:user:delete',
-                  roleInPermission: {
+                  button: 'system:user:delete',
+                  role_in_permission: {
                     create: {
-                      roleId: role.id,
+                      role_id: role.id,
                     },
                   },
                 },
@@ -76,14 +80,16 @@ async function main() {
             },
           },
           {
-            name: '菜单管理',
-            path: 'menu',
-            icon: 'menu',
-            component: '/system/menu/index.tsx',
-            cache: true,
-            roleInPermission: {
+            name: 'function_request',
+            path: 'request',
+            component: 'view.function_request',
+            title: 'function_request',
+            i18n_key: 'route.function_request',
+            icon: 'carbon:network-overlay',
+            order: 3,
+            role_in_permission: {
               create: {
-                roleId: role.id,
+                role_id: role.id,
               },
             },
             children: {
@@ -91,30 +97,30 @@ async function main() {
                 {
                   name: '添加菜单',
                   type: 'BUTTON',
-                  permission: 'system:menu:create',
-                  roleInPermission: {
+                  button: 'system:menu:create',
+                  role_in_permission: {
                     create: {
-                      roleId: role.id,
+                      role_id: role.id,
                     },
                   },
                 },
                 {
                   name: '编辑菜单',
                   type: 'BUTTON',
-                  permission: 'system:menu:edit',
-                  roleInPermission: {
+                  button: 'system:menu:edit',
+                  role_in_permission: {
                     create: {
-                      roleId: role.id,
+                      role_id: role.id,
                     },
                   },
                 },
                 {
                   name: '删除菜单',
                   type: 'BUTTON',
-                  permission: 'system:menu:delete',
-                  roleInPermission: {
+                  button: 'system:menu:delete',
+                  role_in_permission: {
                     create: {
-                      roleId: role.id,
+                      role_id: role.id,
                     },
                   },
                 },
@@ -122,14 +128,16 @@ async function main() {
             },
           },
           {
-            name: '角色管理',
-            path: 'role',
-            icon: 'role',
-            component: '/system/role/index.tsx',
-            cache: true,
-            roleInPermission: {
+            name: 'function_toggle-auth',
+            path: 'toggle-auth',
+            component: 'view.function_toggle-auth',
+            title: 'function_toggle-auth',
+            i18n_key: 'route.function_toggle-auth',
+            icon: 'ic:round-construction',
+            order: 4,
+            role_in_permission: {
               create: {
-                roleId: role.id,
+                role_id: role.id,
               },
             },
             children: {
@@ -137,30 +145,30 @@ async function main() {
                 {
                   name: '添加角色',
                   type: 'BUTTON',
-                  permission: 'system:role:create',
-                  roleInPermission: {
+                  button: 'system:role:create',
+                  role_in_permission: {
                     create: {
-                      roleId: role.id,
+                      role_id: role.id,
                     },
                   },
                 },
                 {
                   name: '编辑角色',
                   type: 'BUTTON',
-                  permission: 'system:role:edit',
-                  roleInPermission: {
+                  button: 'system:role:edit',
+                  role_in_permission: {
                     create: {
-                      roleId: role.id,
+                      role_id: role.id,
                     },
                   },
                 },
                 {
                   name: '删除角色',
                   type: 'BUTTON',
-                  permission: 'system:role:delete',
-                  roleInPermission: {
+                  button: 'system:role:delete',
+                  role_in_permission: {
                     create: {
-                      roleId: role.id,
+                      role_id: role.id,
                     },
                   },
                 },
@@ -172,7 +180,7 @@ async function main() {
     },
     update: {},
     where: {
-      name: '系统管理',
+      name: 'function',
     },
   });
 
@@ -191,9 +199,9 @@ async function main() {
           nickname: '超级管理员',
         },
       },
-      roleInUser: {
+      role_in_user: {
         create: {
-          roleId: role.id,
+          role_id: role.id,
         },
       },
     },
@@ -214,9 +222,9 @@ async function main() {
           nickname: '超级管理员2',
         },
       },
-      roleInUser: {
+      role_in_user: {
         create: {
-          roleId: role.id,
+          role_id: role.id,
         },
       },
     },

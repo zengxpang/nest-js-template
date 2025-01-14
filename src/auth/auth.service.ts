@@ -10,7 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import * as svgCaptcha from 'svg-captcha';
 import { compare } from 'bcrypt';
 
-import { createMenus, getSystemConfig } from '@/common';
+import { getSystemConfig } from '@/common';
 
 import { RedisService } from '@/redis/redis.service';
 import { UserService } from '@/user/user.service';
@@ -172,12 +172,10 @@ export class AuthService {
 
     const userPermissionInfoItem = head(userPermissionInfo);
     const userAuthInfo: UserInfoEntity = {
-      nickname: userPermissionInfoItem.nickname,
-      username: userPermissionInfoItem.username,
-      avatar: userPermissionInfoItem.avatar,
+      userId: userPermissionInfoItem.nickname,
+      userName: userPermissionInfoItem.username,
       roles: split(userPermissionInfoItem.role_names, ','),
-      permissions: [],
-      menus: [],
+      buttons: [],
     };
 
     if (size(userAuthInfo.roles) === 0) {
@@ -187,17 +185,11 @@ export class AuthService {
     const systemConfig = getSystemConfig(this.configService);
     const isDefaultAdmin =
       userPermissionInfoItem.username === systemConfig.DEFAULT_ADMIN_USERNAME;
-    userAuthInfo.permissions = isDefaultAdmin
+    userAuthInfo.buttons = isDefaultAdmin
       ? [systemConfig.DEFAULT_ADMIN_PERMISSION]
-      : map(filter(userPermissionInfo, 'permission'), 'permission');
+      : map(filter(userPermissionInfo, 'button'), 'button');
 
-    this.redisService.setUserPermission(useId, userAuthInfo.permissions);
-
-    const menus = filter(
-      userPermissionInfo,
-      (item) => item.type && item.type !== 'BUTTON',
-    );
-    userAuthInfo.menus = createMenus(menus);
+    this.redisService.setUserPermission(useId, userAuthInfo.buttons);
 
     return userAuthInfo;
   }

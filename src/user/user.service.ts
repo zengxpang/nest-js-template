@@ -38,19 +38,18 @@ export class UserService {
                  GROUP BY ur.user_id
              ),
              role_permissions AS (
-                 SELECT ur.user_id, p.pid, p.id, p.name, p.path, p.permission, p.type, p.icon,
-                        p.component, p.redirect, p.hidden, p.sort, p.cache, p.props
+                 SELECT ur.user_id, p.pid, p.id, p.type, p.button, p.name, p.path, p.component, p.title,
+                        p.i18n_key, p.order, p.keep_alive, p.constant, p.icon,p.local_icon,p.href,p.hide_in_menu,p.active_menu,p.multi_tab,p.fixed_index_tab
                  FROM user_roles ur
                           JOIN role_in_permission rp ON FIND_IN_SET(rp.role_id, ur.role_ids) > 0
-                          JOIN permissions p ON rp.permission_id = p.id AND p.disabled = false
+                          JOIN permissions p ON rp.permission_id = p.id
              )
-        SELECT fu.username, fu.nickname, fu.avatar, ur.role_names, rp.pid,
-               rp.id, rp.name, rp.path, rp.permission, rp.type, rp.icon, rp.component, rp.redirect, rp.hidden,
-               rp.sort, rp.cache, rp.props
+        SELECT fu.username, fu.nickname, fu.avatar, ur.role_names, rp.pid, rp.id, rp.type, rp.button, rp.name, rp.path, rp.component, rp.title,
+               rp.i18n_key, rp.order, rp.keep_alive, rp.constant, rp.icon,rp.local_icon,rp.href,rp.hide_in_menu,rp.active_menu,rp.multi_tab,rp.fixed_index_tab
         FROM filtered_users fu
                  LEFT JOIN user_roles ur ON fu.id = ur.user_id
                  LEFT JOIN role_permissions rp ON fu.id = rp.user_id
-        ORDER BY rp.sort DESC;
+        ORDER BY rp.order DESC;
     `;
   }
 }

@@ -1,20 +1,13 @@
-import { MenuEntity } from './menu.entity';
-
 export class UserInfoEntity {
   /**
    * 昵称
    */
-  nickname: string;
+  userId: string;
 
   /**
    * 用户名
    */
-  username: string;
-
-  /**
-   * 用户头像
-   */
-  avatar?: string;
+  userName: string;
 
   /**
    * 用户角色
@@ -24,10 +17,5 @@ export class UserInfoEntity {
   /**
    * 用户权限
    */
-  permissions?: string[] = [];
-
-  /**
-   * 用户可访问菜单
-   */
-  menus?: MenuEntity[] = [];
+  buttons?: string[] = [];
 }

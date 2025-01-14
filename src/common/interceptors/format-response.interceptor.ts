@@ -34,9 +34,9 @@ export class FormatResponseInterceptor<T> implements NestInterceptor {
         }
 
         const result: FormatResponseEntity<T> = {
-          statusCode: 200,
+          code: 200,
           data: data ?? null,
-          message: 'success',
+          msg: 'success',
         };
 
         // 调用记录日志方法

@@ -1,6 +1,10 @@
-import { User, Profile, Permission } from '@prisma/client';
+import { User, Profile, Permission, $Enums } from '@prisma/client';
 
-export class UserPermissionInfoEntity {
+export class UserPermissionInfoEntity
+  implements
+    Omit<Permission, 'created_at' | 'updated_at' | 'parent' | 'children'>
+{
+  pid: number;
   /**
    * 用户名
    */
@@ -22,67 +26,24 @@ export class UserPermissionInfoEntity {
   role_names: string;
 
   /**
-   * 权限id
+   *
    */
-  id: Permission['id'];
-
-  /**
-   * 父权限id
-   */
-  pid: Permission['pid'];
-
-  /**
-   * 权限名称
-   */
-  name: Permission['name'];
-
-  /**
-   * 权限路径
-   */
-  path: Permission['path'];
-
-  /**
-   * 权限标识
-   */
-  permission: Permission['permission'];
-
-  /**
-   * 权限类型
-   */
-  type: Permission['type'];
-
-  /**
-   * 组件路径
-   */
-  component: Permission['component'];
-
-  /**
-   * 是否缓存
-   */
-  cache: Permission['cache'];
-
-  /**
-   * 是否隐藏
-   */
-  hidden: Permission['hidden'];
-
-  /**
-   * 图标
-   */
-  icon: Permission['icon'];
-
-  /**
-   * 重定向地址
-   */
-  redirect: Permission['redirect'];
-
-  /**
-   * 路由属性
-   */
-  props: Permission['props'];
-
-  /**
-   * 排序
-   */
-  sort: Permission['sort'];
+  name: string;
+  id: number;
+  type: $Enums.MenuType;
+  button: string;
+  path: string;
+  component: string;
+  title: string;
+  i18n_key: string;
+  order: number;
+  keep_alive: boolean;
+  constant: boolean;
+  icon: string;
+  local_icon: string;
+  href: string;
+  hide_in_menu: boolean;
+  active_menu: string;
+  multi_tab: boolean;
+  fixed_index_tab: number;
 }

@@ -1,3 +1,7 @@
+GET {{host}}/route/getUserRoute
+Accept: application/json
+
+###
 GET {{host}}/app/hello
 Accept: application/json
 x-lang: zh

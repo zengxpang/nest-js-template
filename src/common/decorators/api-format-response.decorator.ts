@@ -6,7 +6,7 @@ class FormatResponseEntity<T = unknown> {
   /**
    * 状态码
    */
-  statusCode?: HttpStatus = 200;
+  code?: HttpStatus = 200;
 
   /**
    * 返回数据
@@ -16,7 +16,7 @@ class FormatResponseEntity<T = unknown> {
   /**
    * 返回信息
    */
-  message?: string = 'success';
+  msg?: string = 'success';
 }
 
 export const ApiFormatResponse = <TModel extends Type<any>>(
@@ -32,12 +32,12 @@ export const ApiFormatResponse = <TModel extends Type<any>>(
           {
             properties: {
               // 显实指定属性，不然生成不了，原因未知
-              statusCode: {
+              code: {
                 type: 'integer',
                 description: '状态码',
                 example: HttpStatus.OK,
               },
-              message: {
+              msg: {
                 type: 'string',
                 description: '返回信息',
                 example: 'success',
@@ -61,12 +61,12 @@ export const ApiFormatResponse = <TModel extends Type<any>>(
           { $ref: getSchemaPath(FormatResponseEntity) },
           {
             properties: {
-              statusCode: {
+              code: {
                 type: 'integer',
                 description: '状态码',
                 example: HttpStatus.OK,
               },
-              message: {
+              msg: {
                 type: 'string',
                 description: '返回信息',
                 example: 'success',
