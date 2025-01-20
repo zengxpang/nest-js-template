@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { CustomPrismaModule } from 'nestjs-prisma';
 import {
   utilities as nestWinstonModuleUtilities,
@@ -11,13 +11,11 @@ import {
   AcceptLanguageResolver,
   HeaderResolver,
   I18nModule,
-  QueryResolver,
 } from 'nestjs-i18n';
 import * as winston from 'winston';
 import * as path from 'path';
 
 import {
-  CustomExceptionFilter,
   FormatResponseInterceptor,
   getSystemConfig,
   InvokeRecordInterceptor,
@@ -129,7 +127,7 @@ import { RouteModule } from './route/route.module';
           ),
         };
       },
-      resolvers: [AcceptLanguageResolver, new HeaderResolver(['x-lang'])],
+      resolvers: [new HeaderResolver(['x-lang']), AcceptLanguageResolver],
       inject: [ConfigService],
     }),
     EmailModule,
@@ -148,10 +146,6 @@ import { RouteModule } from './route/route.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: InvokeRecordInterceptor,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: CustomExceptionFilter,
     },
     {
       provide: APP_GUARD,

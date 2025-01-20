@@ -31,6 +31,16 @@ interface ISystemConfig {
   SIGN_IN_ERROR_LIMIT: number;
 
   FALLBACK_LANGUAGE: string;
+
+  EMAIL_CAPTCHA_EXPIRES_IN: number;
+
+  BCRYPT_SALT_ROUNDS: number;
+
+  NODEMAILER_SERVER_HOST: string;
+  NODEMAILER_SERVER_PORT: number;
+  NODEMAILER_SERVER_AUTH_USER: string;
+  NODEMAILER_SERVER_AUTH_PASS: string;
+  NODEMAILER_SERVER_SECURE: boolean;
   // todo
 }
 
@@ -82,5 +92,23 @@ export const getSystemConfig = (
     SIGN_IN_ERROR_LIMIT: +configService.get<number>('SIGN_IN_ERROR_LIMIT') || 5,
 
     FALLBACK_LANGUAGE: configService.get<string>('FALLBACK_LANGUAGE') || 'zh',
+
+    EMAIL_CAPTCHA_EXPIRES_IN:
+      +configService.get<number>('EMAIL_CAPTCHA_EXPIRES_IN') || 300,
+
+    BCRYPT_SALT_ROUNDS: +configService.get<number>('BCRYPT_SALT_ROUNDS') || 10,
+
+    NODEMAILER_SERVER_HOST:
+      configService.get<string>('NODEMAILER_SERVER_HOST') || 'smtp.qq.com',
+    NODEMAILER_SERVER_PORT:
+      +configService.get<number>('NODEMAILER_SERVER_PORT') || 465,
+    NODEMAILER_SERVER_AUTH_USER:
+      configService.get<string>('NODEMAILER_SERVER_AUTH_USER') ||
+      '2531069259@qq.com',
+    NODEMAILER_SERVER_AUTH_PASS:
+      configService.get<string>('NODEMAILER_SERVER_AUTH_PASS') ||
+      'zdhawcsqzjofdhgj',
+    NODEMAILER_SERVER_SECURE:
+      configService.get<boolean>('NODEMAILER_SERVER_SECURE') || false,
   };
 };

@@ -1,1 +1,1 @@
-export * from './custom-exception.filter';
+export * from './all-exception.filter';

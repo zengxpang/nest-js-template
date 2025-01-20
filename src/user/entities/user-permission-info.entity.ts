@@ -4,11 +4,12 @@ export class UserPermissionInfoEntity
   implements
     Omit<Permission, 'created_at' | 'updated_at' | 'parent' | 'children'>
 {
-  pid: number;
   /**
    * 用户名
    */
   username: User['username'];
+
+  user_id: User['id'];
 
   /**
    * 昵称
@@ -30,6 +31,7 @@ export class UserPermissionInfoEntity
    */
   name: string;
   id: number;
+  pid: number;
   type: $Enums.MenuType;
   button: string;
   path: string;

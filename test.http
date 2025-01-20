@@ -1,10 +1,14 @@
+GET {{host}}/auth/createRegisterCaptcha?email=zengxpang@163.com
+Accept: application/json
+
+###
 GET {{host}}/route/getUserRoute
 Accept: application/json
 
 ###
 GET {{host}}/app/hello
 Accept: application/json
-x-lang: zh
+x-lang: en
 
 ###
 GET {{host}}/app/name
@@ -33,10 +37,10 @@ Accept: application/json
 ### 登陆
 POST {{host}}/auth/login
 Content-Type: application/json
-x-lang: zh
+x-lang: en
 
 {
-  "password": "123456",
-  "captcha": "dQmE"
+  "username": "zengxpang",
+  "password": "123456"
 }
 

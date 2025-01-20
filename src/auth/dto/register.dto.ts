@@ -1,9 +1,8 @@
-import { IsNotEmpty, Matches } from 'class-validator';
+import { IsEmail, IsNotEmpty, Matches } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
-
 import { I18nTranslations } from '@/generated/i18n.generated';
 
-export class LoginDto {
+export class RegisterDto {
   /**
    * 用户名
    */
@@ -34,4 +33,18 @@ export class LoginDto {
     message: i18nValidationMessage<I18nTranslations>('validate.captcha.1'),
   })
   captcha: string;
+
+  /**
+   * 邮箱
+   */
+  @IsNotEmpty({
+    message: i18nValidationMessage<I18nTranslations>('validate.email.0'),
+  })
+  @IsEmail(
+    {},
+    {
+      message: i18nValidationMessage<I18nTranslations>('validate.email.1'),
+    },
+  )
+  email: string;
 }

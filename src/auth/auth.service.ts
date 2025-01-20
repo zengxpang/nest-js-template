@@ -9,9 +9,10 @@ import { filter, head, isEmpty, size, split, toLower, map } from 'lodash';
 import { ConfigService } from '@nestjs/config';
 import * as svgCaptcha from 'svg-captcha';
 import { compare } from 'bcrypt';
+import { I18nService } from 'nestjs-i18n';
 
+import { I18nTranslations } from '@/generated/i18n.generated';
 import { getSystemConfig } from '@/common';
-
 import { RedisService } from '@/redis/redis.service';
 import { UserService } from '@/user/user.service';
 import { UserInfoEntity } from '@/auth/entities/user-info.entity';
@@ -19,6 +20,8 @@ import { UserInfoEntity } from '@/auth/entities/user-info.entity';
 import { LoginEntity } from './entities/login.entity';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { RegisterDto } from './dto/register.dto';
+import { EmailService } from '@/email/email.service';
 
 @Injectable()
 export class AuthService {
@@ -30,6 +33,10 @@ export class AuthService {
   private readonly redisService: RedisService;
   @Inject(UserService)
   private readonly userService: UserService;
+  @Inject(EmailService)
+  private readonly emailService: EmailService;
+  @Inject(I18nService)
+  i18n: I18nService<I18nTranslations>;
 
   createCaptcha(ip: string, userAgent: string) {
     const captcha = svgCaptcha.create({
@@ -44,6 +51,48 @@ export class AuthService {
     return {
       captcha: `data:image/svg+xml;base64,${Buffer.from(captcha.data).toString('base64')}`,
     };
+  }
+
+  async createRegisterCaptcha(email: string) {
+    const result = await this.emailService.sendMail({
+      email,
+      subject: '注册验证码',
+    });
+    this.redisService.setEmailCaptcha(email, result?.code);
+    return '验证码已发送';
+  }
+
+  async register(registerDto: RegisterDto) {
+    const { username, password, captcha, email } = registerDto;
+    const emailCaptcha = await this.redisService.getEmailCaptcha(email);
+    if (!emailCaptcha) {
+      throw new BadRequestException(
+        this.i18n.t('badRequest.email.captchaInvalid'),
+      );
+    }
+
+    if (emailCaptcha !== captcha) {
+      throw new BadRequestException(
+        this.i18n.t('badRequest.email.captchaError'),
+      );
+    }
+
+    const user = await this.userService.findUser(username);
+
+    if (!isEmpty(user)) {
+      throw new BadRequestException(this.i18n.t('badRequest.user.userExist'));
+    }
+
+    const emailIsBeUsed = await this.userService.EmailIsBeUsed(email);
+    if (emailIsBeUsed) {
+      throw new BadRequestException(this.i18n.t('badRequest.user.emailBeUsed'));
+    }
+
+    return await this.userService.createDefaultAdminUser({
+      username,
+      password,
+      email,
+    });
   }
 
   async login(loginDto: LoginDto, ip: string, userAgent: string) {
@@ -172,7 +221,7 @@ export class AuthService {
 
     const userPermissionInfoItem = head(userPermissionInfo);
     const userAuthInfo: UserInfoEntity = {
-      userId: userPermissionInfoItem.nickname,
+      userId: userPermissionInfoItem.user_id,
       userName: userPermissionInfoItem.username,
       roles: split(userPermissionInfoItem.role_names, ','),
       buttons: [],

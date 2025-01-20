@@ -7,6 +7,7 @@ import {
   Headers,
   Get,
   BadRequestException,
+  Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -17,6 +18,7 @@ import { CaptchaEntity } from './entities/captcha.entity';
 import { UserInfoEntity } from './entities/user-info.entity';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { RegisterDto } from './dto/register.dto';
 
 import { AuthService } from './auth.service';
 
@@ -32,6 +34,20 @@ export class AuthController {
   @Get('createCaptcha')
   getCaptcha(@Ip() ip: string, @Headers('user-agent') userAgent: string) {
     return this.authService.createCaptcha(ip, userAgent);
+  }
+
+  @ApiOperation({ summary: '获取注册邮箱验证码' })
+  @IsPublic()
+  @Get('createRegisterCaptcha')
+  createRegisterCaptcha(@Query('email') email: string) {
+    return this.authService.createRegisterCaptcha(email);
+  }
+
+  @ApiOperation({ summary: '注册' })
+  @IsPublic()
+  @Post('register')
+  register(@Body() registerDto: RegisterDto) {
+    return this.authService.register(registerDto);
   }
 
   @ApiOperation({ summary: '登录' })

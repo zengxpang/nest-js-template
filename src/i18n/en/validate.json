@@ -1,7 +1,21 @@
 {
-  "login": [
-    "The username cannot be empty",
+  "username": [
+    "The username cannot be empty"
+  ],
+  "password": [
     "The password cannot be empty",
-    "The captcha cannot be empty"
+    "The password format is incorrect"
+  ],
+  "captcha": [
+    "The captcha cannot be empty",
+    "The captcha format is incorrect"
+  ],
+  "email": [
+    "The email cannot be empty",
+    "The email format is incorrect"
+  ],
+  "confirmPassword": [
+    "The confirm password cannot be empty",
+    "The confirm password format is incorrect"
   ]
 }

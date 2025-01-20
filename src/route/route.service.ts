@@ -34,6 +34,16 @@ export class RouteService {
             order: 1,
           },
         },
+        {
+          name: 'user-center',
+          path: '/user-center',
+          component: 'layout.base$view.user-center',
+          meta: {
+            title: 'user-center',
+            i18nKey: 'route.user-center',
+            hideInMenu: true,
+          },
+        },
         ...createMenuTree(x),
       ],
     };
@@ -82,8 +92,7 @@ const createMenuTree = (
       i18nKey: menu.i18n_key,
       order: menu.order,
       keepAlive: !!menu.keep_alive,
-      // constant: !!menu.constant,
-      constant: true,
+      constant: !!menu.constant,
       icon: menu.icon,
       localIcon: menu.local_icon,
       href: menu.href,

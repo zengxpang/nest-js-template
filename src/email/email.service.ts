@@ -1,19 +1,21 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Transporter, createTransport } from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
+import { getSystemConfig } from '@/common';
 
 @Injectable()
 export class EmailService {
   transporter: Transporter;
 
   constructor(private readonly configService: ConfigService) {
+    const systemConfig = getSystemConfig(this.configService);
     this.transporter = createTransport({
-      host: this.configService.get<string>('NODEMAILER_SERVER_HOST'),
-      port: this.configService.get<number>('NODEMAILER_SERVER_PORT'),
-      secure: this.configService.get<boolean>('NODEMAILER_SERVER_SECURE'),
+      host: systemConfig.NODEMAILER_SERVER_HOST,
+      port: systemConfig.NODEMAILER_SERVER_PORT,
+      secure: systemConfig.NODEMAILER_SERVER_SECURE,
       auth: {
-        user: this.configService.get<string>('NODEMAILER_SERVER_AUTH_USER'),
-        pass: this.configService.get<string>('NODEMAILER_SERVER_AUTH_PASS'),
+        user: systemConfig.NODEMAILER_SERVER_AUTH_USER,
+        pass: systemConfig.NODEMAILER_SERVER_AUTH_PASS,
       },
     });
   }
@@ -34,17 +36,19 @@ export class EmailService {
   }: {
     email: string;
     subject: string;
-    html: string;
+    html?: string;
   }): Promise<Record<string, string>> {
-    const code = Math.random().toString().slice(-6);
+    const code = Math.random().toString().slice(-4);
+    const systemConfig = getSystemConfig(this.configService);
     const options = {
-      from: this.configService.get<string>('NODEMAILER_SERVER_AUTH_USER'),
+      from: {
+        name: '会议室预定系统',
+        address: systemConfig.NODEMAILER_SERVER_AUTH_USER,
+      },
       to: email,
-      text: `用户验证码为：${code}，有效期为5分钟，请及时使用!`,
       subject,
-      html,
+      html: html ?? `用户验证码为：${code}，有效期为5分钟，请及时使用!`,
     };
-    console.log(`用户验证码为：${code}，有效期为5分钟，请及时使用!`);
     return new Promise((resolve, reject) => {
       this.transporter.sendMail(
         options,

@@ -46,6 +46,30 @@ export class RedisService {
     return this.redis.del(key);
   }
 
+  createEmailCaptchaKey(email: string) {
+    return `email-captcha: ${email}`;
+  }
+
+  setEmailCaptcha(email: string, captcha: string) {
+    const expiresIn = getSystemConfig(
+      this.configService,
+    ).EMAIL_CAPTCHA_EXPIRES_IN;
+    return this.redis.set(
+      this.createEmailCaptchaKey(email),
+      captcha,
+      'EX',
+      expiresIn,
+    );
+  }
+
+  getEmailCaptcha(email: string) {
+    return this.redis.get(this.createEmailCaptchaKey(email));
+  }
+
+  delEmailCaptcha(email: string) {
+    return this.redis.del(this.createEmailCaptchaKey(email));
+  }
+
   createSignInErrorsKey(ip: string, userAgent: string) {
     return this.createKey({ ip, userAgent, prefix: 'sign-in:errors' });
   }

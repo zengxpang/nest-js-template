@@ -1,0 +1,10 @@
+{
+  "email": {
+    "captchaInvalid": "The captcha is invalid",
+    "captchaError": "The captcha is incorrect"
+  },
+  "user": {
+    "userExist": "The user already exists",
+    "emailBeUsed": "The email has been used"
+  }
+}

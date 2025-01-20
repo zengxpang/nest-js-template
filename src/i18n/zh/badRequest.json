@@ -1,0 +1,10 @@
+{
+  "email": {
+    "captchaInvalid": "验证码已失效",
+    "captchaError": "验证码错误"
+  },
+  "user": {
+    "userExist": "用户已存在",
+    "emailBeUsed": "邮箱已被使用"
+  }
+}

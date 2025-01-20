@@ -1,19 +1,22 @@
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import {
+  I18nMiddleware,
+  I18nValidationExceptionFilter,
+  I18nValidationPipe,
+} from 'nestjs-i18n';
 import {
   DocumentBuilder,
   SwaggerDocumentOptions,
   SwaggerModule,
 } from '@nestjs/swagger';
 
-import { getSystemConfig } from '@/common';
+import { AllExceptionFilter, getSystemConfig } from '@/common';
 
 import { AppModule } from './app.module';
 import metadata from './metadata';
-import { I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -22,13 +25,18 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const systemConfig = getSystemConfig(configService);
-
+  const winstonLogger = app.get(WINSTON_MODULE_NEST_PROVIDER);
   // 全局前缀
   app.setGlobalPrefix(systemConfig.NEST_PREFIX);
+
+  // winston
+  app.useLogger(winstonLogger);
 
   // static静态服务
   // http://localhost:3000/static/${filename}
   app.useStaticAssets('public', { prefix: '/static' });
+
+  app.use(I18nMiddleware);
 
   app.useGlobalPipes(
     new I18nValidationPipe({
@@ -39,12 +47,10 @@ async function bootstrap() {
 
   app.useGlobalFilters(
     new I18nValidationExceptionFilter({
-      detailedErrors: false,
+      detailedErrors: true,
     }),
+    new AllExceptionFilter(app.get(HttpAdapterHost), winstonLogger),
   );
-
-  // winston
-  app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
   // swagger
   const title = systemConfig.SWAGGER_TITLE;

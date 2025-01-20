@@ -2,17 +2,69 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CustomPrismaService } from 'nestjs-prisma';
 import { ExtendedPrismaClient } from '@/prisma/prisma.extension';
 import { UserPermissionInfoEntity } from '@/user/entities/user-permission-info.entity';
+import { getSystemConfig } from '@/common';
+import { ConfigService } from '@nestjs/config';
+import { hash } from 'bcrypt';
+import { isEmpty } from 'lodash';
 
 @Injectable()
 export class UserService {
   @Inject('PrismaService')
-  private prismaService: CustomPrismaService<ExtendedPrismaClient>;
+  private readonly prismaService: CustomPrismaService<ExtendedPrismaClient>;
+
+  @Inject(ConfigService)
+  private readonly configService: ConfigService;
 
   async findUser(username: string) {
     return await this.prismaService.client.user.findUnique({
       where: {
         username,
         deleted: false,
+      },
+    });
+  }
+
+  async EmailIsBeUsed(email: string) {
+    const profile = await this.prismaService.client.profile.findFirst({
+      where: {
+        email,
+      },
+    });
+
+    console.log(profile);
+    return !isEmpty(profile);
+  }
+
+  async createDefaultAdminUser({
+    username,
+    password,
+    email,
+  }: {
+    username: string;
+    password: string;
+    email: string;
+  }) {
+    const { BCRYPT_SALT_ROUNDS } = getSystemConfig(this.configService);
+    const newPassword = await hash(password, +BCRYPT_SALT_ROUNDS);
+    return await this.prismaService.client.user.upsert({
+      create: {
+        username,
+        password: newPassword,
+        profile: {
+          create: {
+            nickname: '超级管理员',
+            email,
+          },
+        },
+        role_in_user: {
+          create: {
+            role_id: 1,
+          },
+        },
+      },
+      update: {},
+      where: {
+        username,
       },
     });
   }
@@ -44,7 +96,7 @@ export class UserService {
                           JOIN role_in_permission rp ON FIND_IN_SET(rp.role_id, ur.role_ids) > 0
                           JOIN permissions p ON rp.permission_id = p.id
              )
-        SELECT fu.username, fu.nickname, fu.avatar, ur.role_names, rp.pid, rp.id, rp.type, rp.button, rp.name, rp.path, rp.component, rp.title,
+        SELECT fu.id as user_id, fu.username, fu.nickname, fu.avatar, ur.role_names, rp.pid, rp.id, rp.type, rp.button, rp.name, rp.path, rp.component, rp.title,
                rp.i18n_key, rp.order, rp.keep_alive, rp.constant, rp.icon,rp.local_icon,rp.href,rp.hide_in_menu,rp.active_menu,rp.multi_tab,rp.fixed_index_tab
         FROM filtered_users fu
                  LEFT JOIN user_roles ur ON fu.id = ur.user_id
