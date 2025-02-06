@@ -1,7 +1,7 @@
 import { Permission } from '@prisma/client';
 
 export class PermissionEntity
-  implements Omit<Permission, 'deleted' | 'updatedAt' | 'createdAt'>
+  implements Omit<Permission, 'deleted' | 'update_at' | 'create_at'>
 {
   /**
    * 权限id

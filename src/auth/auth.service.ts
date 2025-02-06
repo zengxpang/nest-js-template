@@ -135,7 +135,7 @@ export class AuthService {
   ): Promise<Auth.IPayload | false> {
     const user = await this.userService.findUser(username);
 
-    if (isEmpty(user) || user.disabled) {
+    if (isEmpty(user) || !!user.disabled) {
       return false;
     }
 

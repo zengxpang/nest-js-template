@@ -45,6 +45,69 @@ export class RouteService {
           },
         },
         ...createMenuTree(x),
+        {
+          name: 'manage',
+          path: '/manage',
+          component: 'layout.base',
+          meta: {
+            title: 'manage',
+            i18nKey: 'route.manage',
+            icon: 'carbon:cloud-service-management',
+            order: 9,
+            roles: ['super admin'],
+          },
+          children: [
+            {
+              name: 'manage_user',
+              path: 'user',
+              component: 'view.manage_user',
+              meta: {
+                i18nKey: 'route.manage_user',
+                icon: 'ic:round-manage-accounts',
+                order: 1,
+                roles: ['super admin'],
+                title: 'manage_user',
+              },
+            },
+            {
+              name: 'manage_role',
+              path: 'role',
+              component: 'view.manage_role',
+              meta: {
+                i18nKey: 'route.manage_role',
+                icon: 'carbon:user-role',
+                order: 2,
+                roles: ['super admin'],
+                title: 'manage_role',
+              },
+            },
+            {
+              name: 'manage_menu',
+              path: 'menu',
+              component: 'view.manage_menu',
+              meta: {
+                i18nKey: 'route.manage_menu',
+                icon: 'material-symbols:route',
+                keepAlive: true,
+                order: 3,
+                roles: ['super admin'],
+                title: 'manage_menu',
+              },
+            },
+            {
+              name: 'manage_user-detail',
+              path: 'user-detail/:id',
+              component: 'view.manage_user-detail',
+              meta: {
+                title: 'manage_user-detail',
+                i18nKey: 'route.manage_user-detail',
+                hideInMenu: true,
+                roles: ['super admin'],
+                activeMenu: 'manage_user',
+              },
+            },
+          ],
+        },
       ],
     };
   }
@@ -64,6 +127,18 @@ export class RouteService {
         },
       },
     ];
+  }
+
+  async createUserRouters() {
+    //
+  }
+
+  async createAdminRouters() {
+    //
+  }
+
+  async createSuperAdminRouters() {
+    //
   }
 }
 

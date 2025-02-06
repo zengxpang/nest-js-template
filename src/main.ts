@@ -40,7 +40,6 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new I18nValidationPipe({
-      whitelist: true, // 过滤掉接口不接受的额外参数
       transform: true, // 可以将请求参数转换为对应的类型（隐式转换，就不需要手动使用ParseIntPipe等），每个路径参数和查询参数默认都是字符串类型，所以不需要使用ParseStringPipe等
     }),
   );

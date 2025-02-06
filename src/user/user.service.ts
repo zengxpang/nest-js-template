@@ -19,7 +19,7 @@ export class UserService {
     return await this.prismaService.client.user.findUnique({
       where: {
         username,
-        deleted: false,
+        deleted: 0,
       },
     });
   }

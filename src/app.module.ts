@@ -32,6 +32,7 @@ import { PermissionModule } from './permission/permission.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RouteModule } from './route/route.module';
+import { SystemModule } from './system/system.module';
 
 @Module({
   imports: [
@@ -136,6 +137,7 @@ import { RouteModule } from './route/route.module';
     RedisModule,
     PermissionModule,
     RouteModule,
+    SystemModule,
   ],
   providers: [
     AppService,
