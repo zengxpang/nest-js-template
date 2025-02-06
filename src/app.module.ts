@@ -33,6 +33,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RouteModule } from './route/route.module';
 import { SystemModule } from './system/system.module';
+import { ServiceMonitorModule } from './service-monitor/service-monitor.module';
 
 @Module({
   imports: [
@@ -138,6 +139,7 @@ import { SystemModule } from './system/system.module';
     PermissionModule,
     RouteModule,
     SystemModule,
+    ServiceMonitorModule,
   ],
   providers: [
     AppService,

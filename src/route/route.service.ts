@@ -108,6 +108,17 @@ export class RouteService {
             },
           ],
         },
+        {
+          name: 'service-monitor',
+          path: '/service-monitor',
+          component: 'layout.base$view.service-monitor',
+          meta: {
+            order: 10,
+            title: 'service-monitor',
+            i18nKey: 'route.service-monitor',
+            icon: 'streamline:online-medical-service-monitor',
+          },
+        },
       ],
     };
   }
