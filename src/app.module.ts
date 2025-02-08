@@ -34,6 +34,8 @@ import { AppService } from './app.service';
 import { RouteModule } from './route/route.module';
 import { SystemModule } from './system/system.module';
 import { ServiceMonitorModule } from './service-monitor/service-monitor.module';
+import { RoomModule } from '@/room/room.module';
+import { MinioModule } from '@/minio/minio.module';
 
 @Module({
   imports: [
@@ -140,6 +142,8 @@ import { ServiceMonitorModule } from './service-monitor/service-monitor.module';
     RouteModule,
     SystemModule,
     ServiceMonitorModule,
+    RoomModule,
+    MinioModule,
   ],
   providers: [
     AppService,

@@ -9,6 +9,9 @@ export class UserPermissionInfoEntity
    */
   username: User['username'];
 
+  /**
+   * 用户ID
+   */
   user_id: User['id'];
 
   /**
@@ -20,6 +23,31 @@ export class UserPermissionInfoEntity
    * 头像
    */
   avatar: Profile['avatar'];
+
+  /**
+   * 邮箱
+   */
+  email: Profile['email'];
+
+  /**
+   * 电话
+   */
+  phone: Profile['phone'];
+
+  /**
+   * 性别
+   */
+  gender: $Enums.Gender;
+
+  /**
+   * 生日
+   */
+  birthday: Profile['birthday'];
+
+  /**
+   * 描述
+   */
+  user_description: Profile['description'];
 
   /**
    * 角色

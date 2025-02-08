@@ -3,6 +3,20 @@ import { Permission } from '@prisma/client';
 export class PermissionEntity
   implements Omit<Permission, 'deleted' | 'update_at' | 'create_at'>
 {
+  button: string;
+  title: string;
+  i18n_key: string;
+  order: number;
+  keep_alive: boolean;
+  constant: boolean;
+  local_icon: string;
+  href: string;
+  hide_in_menu: boolean;
+  active_menu: string;
+  multi_tab: boolean;
+  fixed_index_tab: number;
+  created_at: Date;
+  updated_at: Date;
   /**
    * 权限id
    */

@@ -41,6 +41,11 @@ interface ISystemConfig {
   NODEMAILER_SERVER_AUTH_USER: string;
   NODEMAILER_SERVER_AUTH_PASS: string;
   NODEMAILER_SERVER_SECURE: boolean;
+
+  MINIO_SERVER_ENDPOINT: string;
+  MINIO_SERVER_PORT: number;
+  MINIO_SERVER_ACCESS_KEY: string;
+  MINIO_SERVER_SECRET_KEY: string;
   // todo
 }
 
@@ -110,5 +115,15 @@ export const getSystemConfig = (
       'zdhawcsqzjofdhgj',
     NODEMAILER_SERVER_SECURE:
       configService.get<boolean>('NODEMAILER_SERVER_SECURE') || false,
+
+    MINIO_SERVER_ENDPOINT:
+      configService.get<string>('MINIO_SERVER_ENDPOINT') || 'localhost',
+    MINIO_SERVER_PORT: +configService.get<number>('MINIO_SERVER_PORT') || 9000,
+    MINIO_SERVER_ACCESS_KEY:
+      configService.get<string>('MINIO_SERVER_ACCESS_KEY') ||
+      '5OpnF8rGg4C31iBk3LKw',
+    MINIO_SERVER_SECRET_KEY:
+      configService.get<string>('MINIO_SERVER_SECRET_KEY') ||
+      'fwTGO8jfyaiHqNKGtcnVcA62B6Kwo9dY0eL3dLqs',
   };
 };

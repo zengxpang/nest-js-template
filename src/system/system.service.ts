@@ -96,6 +96,7 @@ export class SystemService {
       phone,
       description,
       roles,
+      avatar,
     } = updateUserDto;
     return await this.prismaService.client.user.update({
       where: {
@@ -112,6 +113,7 @@ export class SystemService {
             email,
             phone,
             description,
+            avatar,
           },
         },
         role_in_user: {

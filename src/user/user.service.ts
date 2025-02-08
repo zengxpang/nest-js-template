@@ -74,7 +74,7 @@ export class UserService {
       UserPermissionInfoEntity[]
     >`
         WITH filtered_users AS (
-            SELECT u.id, u.username, p.avatar, p.nickname
+            SELECT u.id, u.username, p.avatar, p.nickname,p.email,p.phone,p.birthday,p.description,p.gender
             FROM users u
                      LEFT JOIN profiles p ON u.id = p.user_id
             WHERE u.id = ${id} AND u.deleted = false AND u.disabled = false
@@ -96,7 +96,7 @@ export class UserService {
                           JOIN role_in_permission rp ON FIND_IN_SET(rp.role_id, ur.role_ids) > 0
                           JOIN permissions p ON rp.permission_id = p.id
              )
-        SELECT fu.id as user_id, fu.username, fu.nickname, fu.avatar, ur.role_names, rp.pid, rp.id, rp.type, rp.button, rp.name, rp.path, rp.component, rp.title,
+        SELECT fu.id as user_id, fu.username, fu.nickname,fu.gender, fu.avatar,fu.email,fu.phone,fu.birthday,fu.description as user_description, ur.role_names, rp.pid, rp.id, rp.type, rp.button, rp.name, rp.path, rp.component, rp.title,
                rp.i18n_key, rp.order, rp.keep_alive, rp.constant, rp.icon,rp.local_icon,rp.href,rp.hide_in_menu,rp.active_menu,rp.multi_tab,rp.fixed_index_tab
         FROM filtered_users fu
                  LEFT JOIN user_roles ur ON fu.id = ur.user_id

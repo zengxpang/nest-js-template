@@ -134,7 +134,7 @@ model Room {
   capacity        Int
   location        String          @db.VarChar(255)
   equipment       String          @db.VarChar(255)
-  is_booked       Boolean         @default(false)
+  is_booked       Int?            @default(0)
   created_at      DateTime        @default(now())
   updated_at      DateTime        @updatedAt
   booking         Booking[]

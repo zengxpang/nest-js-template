@@ -87,4 +87,9 @@ export class CreateUserDto implements UserProfilePick {
    * 角色ids
    */
   roles: number[];
+
+  /**
+   * 头像
+   */
+  avatar?: Profile['avatar'];
 }

@@ -40,6 +40,7 @@ export class RouteService {
           component: 'layout.base$view.user-center',
           meta: {
             title: 'user-center',
+            icon: 'solar:user-id-broken',
             i18nKey: 'route.user-center',
             hideInMenu: true,
           },
@@ -118,6 +119,56 @@ export class RouteService {
             i18nKey: 'route.service-monitor',
             icon: 'streamline:online-medical-service-monitor',
           },
+        },
+        {
+          name: 'meeting',
+          path: '/meeting',
+          component: 'layout.base',
+          meta: {
+            title: 'meeting',
+            i18nKey: 'route.meeting',
+            icon: 'guidance:meeting-room',
+            order: 10,
+            roles: ['super admin'],
+          },
+          children: [
+            {
+              name: 'meeting_room',
+              path: 'meeting_room',
+              component: 'view.meeting_room',
+              meta: {
+                i18nKey: 'route.meeting_room',
+                icon: 'fluent:device-meeting-room-24-regular',
+                order: 1,
+                roles: ['super admin'],
+                title: 'meeting_room',
+              },
+            },
+            {
+              name: 'meeting_booking',
+              path: 'meeting_booking',
+              component: 'view.meeting_booking',
+              meta: {
+                i18nKey: 'route.meeting_booking',
+                icon: 'tabler:brand-booking',
+                order: 2,
+                roles: ['super admin'],
+                title: 'meeting_booking',
+              },
+            },
+            {
+              name: 'meeting_statistics',
+              path: 'meeting_statistics',
+              component: 'view.meeting_statistics',
+              meta: {
+                title: 'meeting_statistics',
+                i18nKey: 'route.meeting_statistics',
+                icon: 'wpf:statistics',
+                order: 4,
+                roles: ['super admin'],
+              },
+            },
+          ],
         },
       ],
     };

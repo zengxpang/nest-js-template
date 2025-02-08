@@ -1,3 +1,14 @@
+POST {{host}}/room/list
+Content-Type: application/json
+
+{
+  "pageNum": 1,
+  "pageSize": 20
+}
+
+###
+
+###
 GET {{host}}/auth/createRegisterCaptcha?email=zengxpang@163.com
 Accept: application/json
 

@@ -224,6 +224,15 @@ export class AuthService {
       userId: userPermissionInfoItem.user_id,
       userName: userPermissionInfoItem.username,
       roles: split(userPermissionInfoItem.role_names, ','),
+      profile: {
+        nickname: userPermissionInfoItem.nickname,
+        email: userPermissionInfoItem.email,
+        avatar: userPermissionInfoItem.avatar,
+        phone: userPermissionInfoItem.phone,
+        gender: userPermissionInfoItem.gender,
+        birthday: userPermissionInfoItem.birthday,
+        description: userPermissionInfoItem.user_description,
+      },
       buttons: [],
     };
 
