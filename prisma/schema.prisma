@@ -14,19 +14,20 @@ datasource db {
 }
 
 model User {
-  id              String          @id @default(cuid()) @db.VarChar(100)
-  username        String          @unique @db.VarChar(20)
-  password        String          @db.VarChar(100)
-  disabled        Int?            @default(0)
-  deleted         Int?            @default(0)
-  created_at      DateTime        @default(now())
-  updated_at      DateTime        @updatedAt
-  profile         Profile?
-  role_in_user    RoleInUser[]
-  booking         Booking[]
-  booking_in_user BookingInUser[]
+  id         String   @id @default(cuid()) @db.VarChar(100)
+  username   String   @unique @db.VarChar(20)
+  password   String   @db.VarChar(100)
+  disabled   Int?     @default(0)
+  deleted    Int?     @default(0)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  profile    Profile?
 
-  @@map("users")
+  roles             UserOnRole[]
+  bookings          Booking[]
+  booking_attendees BookingAttendee[] // 一个用户可以参加多个预定
+
+  @@map("user")
 }
 
 enum Gender {
@@ -46,27 +47,29 @@ model Profile {
   description String?   @db.VarChar(150)
   created_at  DateTime  @default(now())
   updated_at  DateTime  @updatedAt
-  user        User      @relation(fields: [user_id], references: [id])
-  user_id     String    @unique
 
-  @@map("profiles")
+  user_id String @unique
+  user    User   @relation(fields: [user_id], references: [id])
+
+  @@map("profile")
 }
 
 model Role {
-  id                 Int                @id @default(autoincrement())
-  name               String             @unique @db.VarChar(50)
-  description        String?            @db.VarChar(150)
-  disabled           Int?               @default(0) // 0 是false 1是true
-  deleted            Int?               @default(0)
-  created_at         DateTime           @default(now())
-  updated_at         DateTime           @updatedAt
-  role_in_permission RoleInPermission[]
-  role_in_user       RoleInUser[]
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(50)
+  description String?  @db.VarChar(150)
+  disabled    Int?     @default(0) // 0 是false 1是true
+  deleted     Int?     @default(0)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
-  @@map("roles")
+  permissions RoleOnPermission[]
+  users       UserOnRole[]
+
+  @@map("role")
 }
 
-model RoleInUser {
+model UserOnRole {
   roles   Role @relation(fields: [role_id], references: [id])
   role_id Int
 
@@ -74,7 +77,7 @@ model RoleInUser {
   user_id String
 
   @@id([role_id, user_id])
-  @@map("role_in_user")
+  @@map("user_on_role")
 }
 
 enum MenuType {
@@ -108,15 +111,16 @@ model Permission {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  pid                Int?
-  parent             Permission?        @relation("ParentToChildren", fields: [pid], references: [id])
-  children           Permission[]       @relation("ParentToChildren")
-  role_in_permission RoleInPermission[]
+  pid      Int?
+  parent   Permission?  @relation("ParentToChildren", fields: [pid], references: [id])
+  children Permission[] @relation("ParentToChildren")
 
-  @@map("permissions")
+  roles RoleOnPermission[]
+
+  @@map("permission")
 }
 
-model RoleInPermission {
+model RoleOnPermission {
   permissions   Permission @relation(fields: [permission_id], references: [id])
   permission_id Int
 
@@ -124,40 +128,29 @@ model RoleInPermission {
   role_id Int
 
   @@id([role_id, permission_id])
-  @@map("role_in_permission")
+  @@map("role_on_permission")
 }
 
 model Room {
-  id              Int             @id @default(autoincrement())
-  name            String          @unique @db.VarChar(50)
-  description     String          @db.VarChar(255)
-  capacity        Int
-  location        String          @db.VarChar(255)
-  equipment       String          @db.VarChar(255)
-  is_booked       Int?            @default(0)
-  created_at      DateTime        @default(now())
-  updated_at      DateTime        @updatedAt
-  booking         Booking[]
-  booking_in_room BookingInRoom[]
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(50)
+  description String   @db.VarChar(255)
+  capacity    Int
+  location    String   @db.VarChar(255)
+  equipment   String   @db.VarChar(255)
+  is_booked   Int?     @default(0)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
-  @@map("rooms")
-}
+  bookings Booking[]
 
-model BookingInRoom {
-  rooms   Room @relation(fields: [room_id], references: [id])
-  room_id Int
-
-  bookings   Booking @relation(fields: [booking_id], references: [id])
-  booking_id Int
-
-  @@id([room_id, booking_id])
-  @@map("booking_in_room")
+  @@map("room")
 }
 
 enum BookingStatus {
   APPLYING
   PASS
-  REJECTED
+  RELIEVE
   DISMISSED
 }
 
@@ -170,24 +163,26 @@ model Booking {
   created_at DateTime      @default(now())
   updated_at DateTime      @updatedAt
 
+  room    Room @relation(fields: [room_id], references: [id])
+  room_id Int
+
   user    User   @relation(fields: [user_id], references: [id])
   user_id String
 
-  room            Room            @relation(fields: [room_id], references: [id])
-  room_id         Int
-  booking_in_room BookingInRoom[]
-  booking_in_user BookingInUser[]
+  booking_attendees BookingAttendee[] // 预定的参与人列表
 
-  @@map("bookings")
+  @@map("booking")
 }
 
-model BookingInUser {
-  users   User   @relation(fields: [user_id], references: [id])
-  user_id String
-
+model BookingAttendee {
   bookings   Booking @relation(fields: [booking_id], references: [id])
   booking_id Int
 
-  @@id([user_id, booking_id])
-  @@map("booking_in_user")
+  users   User   @relation(fields: [user_id], references: [id])
+  user_id String
+
+  join_at DateTime @default(now())
+
+  @@id([booking_id, user_id])
+  @@map("booking_attendee")
 }

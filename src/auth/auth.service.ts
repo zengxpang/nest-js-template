@@ -240,14 +240,11 @@ export class AuthService {
       return userAuthInfo;
     }
 
-    const systemConfig = getSystemConfig(this.configService);
-    const isDefaultAdmin =
-      userPermissionInfoItem.username === systemConfig.DEFAULT_ADMIN_USERNAME;
-    userAuthInfo.buttons = isDefaultAdmin
-      ? [systemConfig.DEFAULT_ADMIN_PERMISSION]
-      : map(filter(userPermissionInfo, 'button'), 'button');
+    userAuthInfo.buttons = map(filter(userPermissionInfo, 'button'), 'button');
 
-    this.redisService.setUserPermission(useId, userAuthInfo.buttons);
+    if (!isEmpty(userAuthInfo.buttons)) {
+      this.redisService.setUserPermission(useId, userAuthInfo.buttons);
+    }
 
     return userAuthInfo;
   }

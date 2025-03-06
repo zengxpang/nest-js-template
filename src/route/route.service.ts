@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { filter, forEach, isEmpty, map } from 'lodash';
+import { filter, forEach, head, indexOf, isEmpty, map, split } from 'lodash';
 
 import { UserService } from '@/user/user.service';
 import { UserPermissionInfoEntity } from '@/user/entities/user-permission-info.entity';
@@ -15,163 +15,23 @@ export class RouteService {
     const userPermissionInfo =
       await this.userService.findUserPermissionInfo(useId);
 
-    const x = filter(
+    const directoryAndMenuPermissions = filter(
       userPermissionInfo,
       (item) => item.type && item.type !== 'BUTTON',
     );
 
-    return {
-      home: 'home',
-      routes: [
-        {
-          name: 'home',
-          path: '/home',
-          component: 'layout.base$view.home',
-          meta: {
-            title: 'home',
-            i18nKey: 'route.home',
-            icon: 'mdi:monitor-dashboard',
-            order: 1,
-          },
-        },
-        {
-          name: 'user-center',
-          path: '/user-center',
-          component: 'layout.base$view.user-center',
-          meta: {
-            title: 'user-center',
-            icon: 'solar:user-id-broken',
-            i18nKey: 'route.user-center',
-            hideInMenu: true,
-          },
-        },
-        ...createMenuTree(x),
-        {
-          name: 'manage',
-          path: '/manage',
-          component: 'layout.base',
-          meta: {
-            title: 'manage',
-            i18nKey: 'route.manage',
-            icon: 'carbon:cloud-service-management',
-            order: 9,
-            roles: ['super admin'],
-          },
-          children: [
-            {
-              name: 'manage_user',
-              path: 'user',
-              component: 'view.manage_user',
-              meta: {
-                i18nKey: 'route.manage_user',
-                icon: 'ic:round-manage-accounts',
-                order: 1,
-                roles: ['super admin'],
-                title: 'manage_user',
-              },
-            },
-            {
-              name: 'manage_role',
-              path: 'role',
-              component: 'view.manage_role',
-              meta: {
-                i18nKey: 'route.manage_role',
-                icon: 'carbon:user-role',
-                order: 2,
-                roles: ['super admin'],
-                title: 'manage_role',
-              },
-            },
-            {
-              name: 'manage_menu',
-              path: 'menu',
-              component: 'view.manage_menu',
-              meta: {
-                i18nKey: 'route.manage_menu',
-                icon: 'material-symbols:route',
-                keepAlive: true,
-                order: 3,
-                roles: ['super admin'],
-                title: 'manage_menu',
-              },
-            },
-            {
-              name: 'manage_user-detail',
-              path: 'user-detail/:id',
-              component: 'view.manage_user-detail',
-              meta: {
-                title: 'manage_user-detail',
-                i18nKey: 'route.manage_user-detail',
-                hideInMenu: true,
-                roles: ['super admin'],
-                activeMenu: 'manage_user',
-              },
-            },
-          ],
-        },
-        {
-          name: 'service-monitor',
-          path: '/service-monitor',
-          component: 'layout.base$view.service-monitor',
-          meta: {
-            order: 10,
-            title: 'service-monitor',
-            i18nKey: 'route.service-monitor',
-            icon: 'streamline:online-medical-service-monitor',
-          },
-        },
-        {
-          name: 'meeting',
-          path: '/meeting',
-          component: 'layout.base',
-          meta: {
-            title: 'meeting',
-            i18nKey: 'route.meeting',
-            icon: 'guidance:meeting-room',
-            order: 10,
-            roles: ['super admin'],
-          },
-          children: [
-            {
-              name: 'meeting_room',
-              path: 'meeting_room',
-              component: 'view.meeting_room',
-              meta: {
-                i18nKey: 'route.meeting_room',
-                icon: 'fluent:device-meeting-room-24-regular',
-                order: 1,
-                roles: ['super admin'],
-                title: 'meeting_room',
-              },
-            },
-            {
-              name: 'meeting_booking',
-              path: 'meeting_booking',
-              component: 'view.meeting_booking',
-              meta: {
-                i18nKey: 'route.meeting_booking',
-                icon: 'tabler:brand-booking',
-                order: 2,
-                roles: ['super admin'],
-                title: 'meeting_booking',
-              },
-            },
-            {
-              name: 'meeting_statistics',
-              path: 'meeting_statistics',
-              component: 'view.meeting_statistics',
-              meta: {
-                title: 'meeting_statistics',
-                i18nKey: 'route.meeting_statistics',
-                icon: 'wpf:statistics',
-                order: 4,
-                roles: ['super admin'],
-              },
-            },
-          ],
-        },
-      ],
-    };
+    return this.getRoutesByRole(directoryAndMenuPermissions);
+  }
+
+  getRoutesByRole(directoryAndMenuPermissions: UserPermissionInfoEntity[]) {
+    const directoryAndMenuPermission = head(directoryAndMenuPermissions);
+    const roleNamesArray = split(directoryAndMenuPermission?.role_names, ',');
+    const isAdmin = indexOf(roleNamesArray, 'admin') > -1;
+    if (isAdmin) {
+      return this.createAdminRouters(directoryAndMenuPermissions);
+    } else {
+      return this.createUserRouters(directoryAndMenuPermissions);
+    }
   }
 
   async getConstantRoutes() {
@@ -191,16 +51,142 @@ export class RouteService {
     ];
   }
 
-  async createUserRouters() {
-    //
+  async createUserRouters(
+    directoryAndMenuPermissions: UserPermissionInfoEntity[],
+  ) {
+    return {
+      home: 'home',
+      routes: [
+        ...createMenuTree(directoryAndMenuPermissions),
+        {
+          name: 'meeting',
+          path: '/meeting',
+          component: 'layout.base',
+          meta: {
+            title: 'meeting',
+            i18nKey: 'route.meeting',
+            icon: 'guidance:meeting-room',
+            order: 2,
+          },
+          children: [
+            {
+              name: 'meeting_room',
+              path: 'meeting_room',
+              component: 'view.meeting_room',
+              meta: {
+                i18nKey: 'route.meeting_room',
+                icon: 'fluent:device-meeting-room-24-regular',
+                order: 1,
+                title: 'meeting_room',
+              },
+            },
+            {
+              name: 'meeting_my_booking',
+              path: 'meeting_my_booking',
+              component: 'view.meeting_my_booking',
+              meta: {
+                i18nKey: 'route.meeting_my_booking',
+                icon: 'pajamas:history',
+                order: 3,
+                title: 'meeting_my_booking',
+              },
+            },
+          ],
+        },
+        {
+          name: 'service-monitor',
+          path: '/service-monitor',
+          component: 'layout.base$view.service-monitor',
+          meta: {
+            order: 20,
+            title: 'service-monitor',
+            i18nKey: 'route.service-monitor',
+            icon: 'streamline:online-medical-service-monitor',
+          },
+        },
+      ],
+    };
   }
 
-  async createAdminRouters() {
-    //
-  }
-
-  async createSuperAdminRouters() {
-    //
+  async createAdminRouters(
+    directoryAndMenuPermissions: UserPermissionInfoEntity[],
+  ) {
+    return {
+      home: 'home',
+      routes: [
+        ...createMenuTree(directoryAndMenuPermissions),
+        {
+          name: 'meeting',
+          path: '/meeting',
+          component: 'layout.base',
+          meta: {
+            title: 'meeting',
+            i18nKey: 'route.meeting',
+            icon: 'guidance:meeting-room',
+            order: 10,
+          },
+          children: [
+            {
+              name: 'meeting_room',
+              path: 'meeting_room',
+              component: 'view.meeting_room',
+              meta: {
+                i18nKey: 'route.meeting_room',
+                icon: 'fluent:device-meeting-room-24-regular',
+                order: 1,
+                title: 'meeting_room',
+              },
+            },
+            {
+              name: 'meeting_booking',
+              path: 'meeting_booking',
+              component: 'view.meeting_booking',
+              meta: {
+                i18nKey: 'route.meeting_booking',
+                icon: 'tabler:brand-booking',
+                order: 2,
+                roles: ['admin'],
+                title: 'meeting_booking',
+              },
+            },
+            {
+              name: 'meeting_my_booking',
+              path: 'meeting_my_booking',
+              component: 'view.meeting_my_booking',
+              meta: {
+                i18nKey: 'route.meeting_my_booking',
+                icon: 'pajamas:history',
+                order: 3,
+                title: 'meeting_my_booking',
+              },
+            },
+            {
+              name: 'meeting_statistics',
+              path: 'meeting_statistics',
+              component: 'view.meeting_statistics',
+              meta: {
+                title: 'meeting_statistics',
+                i18nKey: 'route.meeting_statistics',
+                icon: 'wpf:statistics',
+                order: 4,
+                roles: ['admin'],
+              },
+            },
+          ],
+        },
+        {
+          name: 'service-monitor',
+          path: '/service-monitor',
+          component: 'layout.base$view.service-monitor',
+          meta: {
+            order: 11,
+            title: 'service-monitor',
+            i18nKey: 'route.service-monitor',
+            icon: 'streamline:online-medical-service-monitor',
+          },
+        },
+      ],
+    };
   }
 }
 

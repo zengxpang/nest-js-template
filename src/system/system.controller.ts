@@ -22,7 +22,6 @@ export class SystemController {
 
   /**
    * 增加用户
-   * @param createUserDto
    */
   @Post('createUser')
   createUser(@Body() createUserDto: CreateUserDto) {
@@ -31,7 +30,6 @@ export class SystemController {
 
   /**
    * 删除用户
-   * @param ids
    */
   @Delete('deleteUsers')
   deleteUsers(
@@ -48,7 +46,6 @@ export class SystemController {
 
   /**
    * 更新用户
-   * @param updateUserDto
    */
   @Post('updateUser')
   updateUser(@Body() updateUserDto: UpdateUserDto) {
@@ -57,11 +54,18 @@ export class SystemController {
 
   /**
    * 获取用户列表
-   * @param userListDto
    */
   @Post('getUserList')
   getUserList(@Body() userListDto: UserListDto) {
     return this.systemService.getUserList(userListDto);
+  }
+
+  /**
+   * 获取所有用户
+   */
+  @Get('getAllUsers')
+  getAllUsers() {
+    return this.systemService.getAllUsers();
   }
 
   @Get('findUser')
@@ -71,7 +75,6 @@ export class SystemController {
 
   /**
    * 增加角色
-   * @param createRoleDto
    */
   @Post('createRole')
   createRole(@Body() createRoleDto: CreateRoleDto) {
@@ -80,7 +83,6 @@ export class SystemController {
 
   /**
    * 删除角色
-   * @param ids
    */
   @Delete('deleteRoles')
   deleteRoles(
@@ -98,7 +100,6 @@ export class SystemController {
 
   /**
    * 更新角色
-   * @param updateRoleDto
    */
   @Post('updateRole')
   updateRole(@Body() updateRoleDto: UpdateRoleDto) {
@@ -107,7 +108,6 @@ export class SystemController {
 
   /**
    * 获取角色列表
-   * @param roleListDto
    */
   @Post('getRoleList')
   getRoleList(@Body() roleListDto: RoleListDto) {

@@ -52,11 +52,11 @@ export class UserService {
         password: newPassword,
         profile: {
           create: {
-            nickname: '超级管理员',
+            nickname: '管理员',
             email,
           },
         },
-        role_in_user: {
+        roles: {
           create: {
             role_id: 1,
           },
@@ -75,8 +75,8 @@ export class UserService {
     >`
         WITH filtered_users AS (
             SELECT u.id, u.username, p.avatar, p.nickname,p.email,p.phone,p.birthday,p.description,p.gender
-            FROM users u
-                     LEFT JOIN profiles p ON u.id = p.user_id
+            FROM user u
+                     LEFT JOIN profile p ON u.id = p.user_id
             WHERE u.id = ${id} AND u.deleted = false AND u.disabled = false
         ),
              user_roles AS (
@@ -84,8 +84,8 @@ export class UserService {
                         GROUP_CONCAT(r.name ORDER BY r.name) AS role_names,
                         GROUP_CONCAT(r.id) AS role_ids
                  FROM filtered_users fu
-                          LEFT JOIN role_in_user ur ON fu.id = ur.user_id
-                          LEFT JOIN roles r ON ur.role_id = r.id
+                          LEFT JOIN user_on_role ur ON fu.id = ur.user_id
+                          LEFT JOIN role r ON ur.role_id = r.id
                  WHERE r.disabled = false
                  GROUP BY ur.user_id
              ),
@@ -93,15 +93,15 @@ export class UserService {
                  SELECT ur.user_id, p.pid, p.id, p.type, p.button, p.name, p.path, p.component, p.title,
                         p.i18n_key, p.order, p.keep_alive, p.constant, p.icon,p.local_icon,p.href,p.hide_in_menu,p.active_menu,p.multi_tab,p.fixed_index_tab
                  FROM user_roles ur
-                          JOIN role_in_permission rp ON FIND_IN_SET(rp.role_id, ur.role_ids) > 0
-                          JOIN permissions p ON rp.permission_id = p.id
+                          JOIN role_on_permission rp ON FIND_IN_SET(rp.role_id, ur.role_ids) > 0
+                          JOIN permission p ON rp.permission_id = p.id
              )
         SELECT fu.id as user_id, fu.username, fu.nickname,fu.gender, fu.avatar,fu.email,fu.phone,fu.birthday,fu.description as user_description, ur.role_names, rp.pid, rp.id, rp.type, rp.button, rp.name, rp.path, rp.component, rp.title,
                rp.i18n_key, rp.order, rp.keep_alive, rp.constant, rp.icon,rp.local_icon,rp.href,rp.hide_in_menu,rp.active_menu,rp.multi_tab,rp.fixed_index_tab
         FROM filtered_users fu
                  LEFT JOIN user_roles ur ON fu.id = ur.user_id
                  LEFT JOIN role_permissions rp ON fu.id = rp.user_id
-        ORDER BY rp.order DESC;
+        ORDER BY rp.order DESC
     `;
   }
 }

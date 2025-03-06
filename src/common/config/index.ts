@@ -7,7 +7,6 @@ interface ISystemConfig {
   DEFAULT_ADMIN_USERNAME: string;
   DEFAULT_ADMIN_PASSWORD: string;
   DEFAULT_ADMIN_ROLE: string;
-  DEFAULT_ADMIN_PERMISSION: string;
 
   SWAGGER_TITLE: string;
   SWAGGER_DESCRIPTION: string;
@@ -57,13 +56,11 @@ export const getSystemConfig = (
     NEST_PORT: +configService.get<number>('NEST_PORT') || 3000,
 
     DEFAULT_ADMIN_USERNAME:
-      configService.get<string>('DEFAULT_ADMIN_USERNAME') || 'sAdmin',
+      configService.get<string>('DEFAULT_ADMIN_USERNAME') || 'admin',
     DEFAULT_ADMIN_PASSWORD:
-      configService.get<string>('DEFAULT_ADMIN_PASSWORD') || 'sAdmin',
+      configService.get<string>('DEFAULT_ADMIN_PASSWORD') || '123456',
     DEFAULT_ADMIN_ROLE:
-      configService.get<string>('DEFAULT_ADMIN_ROLE') || 'super admin',
-    DEFAULT_ADMIN_PERMISSION:
-      configService.get<string>('DEFAULT_ADMIN_PERMISSION') || '*:*:*',
+      configService.get<string>('DEFAULT_ADMIN_ROLE') || 'admin',
 
     SWAGGER_TITLE: configService.get<string>('SWAGGER_TITLE') || 'NestJS',
     SWAGGER_DESCRIPTION: configService.get<string>('SWAGGER_DESCRIPTION') || '',

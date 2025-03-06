@@ -1,46 +1,48 @@
-export class RoomEntity {
+import { Room } from '@prisma/client';
+
+export class RoomEntity implements Room {
   /**
    * 会议室ID
    */
-  id: number;
+  id: Room['id'];
 
   /**
    * 会议室名称
    */
-  name: string;
+  name: Room['name'];
 
   /**
    * 会议室描述
    */
-  description: string;
-
-  /**
-   * 会议室容量
-   */
-  capacity: number;
+  description: Room['description'];
 
   /**
    * 会议室位置
    */
-  location: string;
+  location: Room['location'];
 
   /**
    * 会议室设备
    */
-  equipment: string;
+  equipment: Room['equipment'];
+
+  /**
+   * 会议室容量
+   */
+  capacity: Room['capacity'];
 
   /**
    * 会议室是否被预定
    */
-  isBooked: boolean;
+  is_booked: Room['is_booked'];
 
   /**
    * 会议室创建时间
    */
-  createTime: Date;
+  created_at: Room['created_at'];
 
   /**
    * 会议室更新时间
    */
-  updateTime: Date;
+  updated_at: Room['updated_at'];
 }

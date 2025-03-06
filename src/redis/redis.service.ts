@@ -119,7 +119,7 @@ export class RedisService {
 
   setUserPermission(id: string, permissions: string[]) {
     const key = this.createUserPermissionKey(id);
-    this.redis.sadd(key, permissions ?? []);
+    this.redis.sadd(key, permissions);
     this.redis.expire(
       key,
       getSystemConfig(this.configService).JWT_ACCESS_TOKEN_EXPIRES_IN,

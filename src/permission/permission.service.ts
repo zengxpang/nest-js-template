@@ -16,14 +16,13 @@ export class PermissionService {
       }[]
     >`
         WITH user_permissions AS (
-            SELECT
-                u.username,
-                GROUP_CONCAT(DISTINCT pe.permission) AS permissions
-            FROM users u
-                     LEFT JOIN role_in_user ur ON u.id = ur.user_id
-                     LEFT JOIN roles r ON ur.role_id = r.id AND r.deleted = FALSE AND r.disabled = FALSE
-                     LEFT JOIN role_in_permission rp ON r.id = rp.role_id
-                     LEFT JOIN permissions pe ON rp.permission_id = pe.id AND pe.deleted = FALSE AND pe.disabled = FALSE
+            SELECT username,
+                   GROUP_CONCAT(DISTINCT pe.name) AS permissions
+            FROM user u
+                     LEFT JOIN user_on_role ur ON u.id = ur.user_id
+                     LEFT JOIN role r ON ur.role_id = r.id AND r.deleted = FALSE AND r.disabled = FALSE
+                     LEFT JOIN role_on_permission rp ON r.id = rp.role_id
+                     LEFT JOIN permission pe ON rp.permission_id = pe.id
             WHERE u.id = ${userId} AND u.deleted = FALSE AND u.disabled = FALSE
             GROUP BY u.username
         )

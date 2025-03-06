@@ -32,6 +32,20 @@ export class RoomController {
   private readonly roomService: RoomService;
 
   /**
+   * 获取所有会议室
+   */
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    type: RoomEntity,
+    isArray: true,
+  })
+  @IsPublic()
+  @Get('/all')
+  findAll() {
+    return this.roomService.findAll();
+  }
+
+  /**
    * 会议室列表
    */
   @ApiBearerAuth()

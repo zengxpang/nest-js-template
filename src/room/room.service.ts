@@ -107,4 +107,8 @@ export class RoomService {
     });
     return '删除成功';
   }
+
+  async findAll() {
+    return await this.prismaService.client.room.findMany();
+  }
 }

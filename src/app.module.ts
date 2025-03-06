@@ -34,8 +34,9 @@ import { AppService } from './app.service';
 import { RouteModule } from './route/route.module';
 import { SystemModule } from './system/system.module';
 import { ServiceMonitorModule } from './service-monitor/service-monitor.module';
-import { RoomModule } from '@/room/room.module';
-import { MinioModule } from '@/minio/minio.module';
+import { RoomModule } from './room/room.module';
+import { MinioModule } from './minio/minio.module';
+import { BookingModule } from './booking/booking.module';
 
 @Module({
   imports: [
@@ -144,6 +145,7 @@ import { MinioModule } from '@/minio/minio.module';
     ServiceMonitorModule,
     RoomModule,
     MinioModule,
+    BookingModule,
   ],
   providers: [
     AppService,

@@ -1,3 +1,7 @@
+GET {{host}}}/room/all
+Accept: application/json
+
+###
 POST {{host}}/room/list
 Content-Type: application/json
 

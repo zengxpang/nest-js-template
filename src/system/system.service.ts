@@ -52,7 +52,7 @@ export class SystemService {
             description,
           },
         },
-        role_in_user: {
+        roles: {
           create: map(roles, (role_id) => ({
             roles: {
               connect: {
@@ -64,7 +64,7 @@ export class SystemService {
       },
       include: {
         profile: true,
-        role_in_user: true,
+        roles: true,
       },
     });
   }
@@ -116,7 +116,7 @@ export class SystemService {
             avatar,
           },
         },
-        role_in_user: {
+        roles: {
           // ole_in_user 的关联关系已经存在，导致无法使用 create 方法来添加新的关联。你需要先删除现有的关联，然后再创建新的关联
           deleteMany: {
             user_id: id,
@@ -132,7 +132,7 @@ export class SystemService {
       },
       include: {
         profile: true,
-        role_in_user: true,
+        roles: true,
       },
     });
   }
@@ -155,18 +155,6 @@ export class SystemService {
       deleted,
     };
     const profileCondition: Share.IKeyValue = {};
-    // const offset = (pageNum - 1) * pageSize;
-    //
-    // return await this.prismaService.client.$queryRaw`
-    //     WITH users_profile AS (
-    //         SELECT u.id , u.username, u.disabled, u.deleted , p.id as profile_id, p.nickname, p.avatar, p.email,p.phone,p.gender,p.birthday,p.description FROM users u LEFT JOIN profiles p ON u.id = p.user_id
-    //     ),
-    //          user_roles AS (
-    //              SELECT ru.user_id, GROUP_CONCAT(r.name ORDER BY r.name) AS role_name FROM users_profile up LEFT JOIN role_in_user ru ON up.id = ru.user_id LEFT JOIN roles r ON ru.role_id = r.id GROUP BY ru.user_id
-    //          )
-    //     SELECT up.id, up.username, up.disabled, up.deleted, up.profile_id, up.nickname, up.avatar, up.email,up.phone,up.gender,up.birthday,up.description, ur.role_name FROM users_profile up
-    //     LEFT JOIN user_roles ur ON up.id = ur.user_id LIMIT ${pageSize} OFFSET ${offset};
-    // `;
 
     if (username) {
       userCondition.username = {
@@ -228,7 +216,7 @@ export class SystemService {
               updated_at: false,
             },
           },
-          role_in_user: {
+          roles: {
             select: {
               roles: true,
             },
@@ -242,12 +230,45 @@ export class SystemService {
 
     const userList = map(result, (item) => {
       return {
-        ...omit(item, ['profile', 'role_in_user']),
+        ...omit(item, ['profile', 'roles']),
         ...{ ...omit(item.profile, ['id']), profile_id: item.profile?.id },
-        roles: map(item.role_in_user, 'roles'),
+        roles: map(item.roles, 'roles'),
       };
     });
     return [userList, meta];
+  }
+
+  async getAllUsers() {
+    return this.prismaService.client.user.findMany({
+      select: {
+        id: true,
+        password: false,
+        username: true,
+        disabled: true,
+        deleted: true,
+        created_at: true,
+        updated_at: true,
+        profile: {
+          select: {
+            id: true,
+            nickname: true,
+            avatar: true,
+            email: true,
+            phone: true,
+            gender: true,
+            birthday: true,
+            description: true,
+            created_at: false,
+            updated_at: false,
+          },
+        },
+        roles: {
+          select: {
+            roles: true,
+          },
+        },
+      },
+    });
   }
 
   async findUser(id: string) {
@@ -277,7 +298,7 @@ export class SystemService {
             updated_at: false,
           },
         },
-        role_in_user: {
+        roles: {
           select: {
             roles: true,
           },
@@ -285,9 +306,9 @@ export class SystemService {
       },
     });
     return {
-      ...omit(result, ['profile', 'role_in_user']),
+      ...omit(result, ['profile', 'roles']),
       ...{ ...omit(result.profile, ['id']), profile_id: result.profile?.id },
-      roles: map(result.role_in_user, 'roles'),
+      roles: map(result.roles, 'roles'),
     };
   }
 
