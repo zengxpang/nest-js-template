@@ -17,7 +17,7 @@ import * as path from 'path';
 
 import {
   FormatResponseInterceptor,
-  getSystemConfig,
+  getBaseConfig,
   InvokeRecordInterceptor,
   AuthorityGuard,
   JwtAuthGuard,
@@ -50,12 +50,15 @@ import { BookingModule } from './booking/booking.module';
     }),
     WinstonModule.forRootAsync({
       useFactory: (configService: ConfigService) => {
-        const config = getSystemConfig(configService);
-        const datePattern = config.WINSTON_LOG_DATE_PATTERN;
-        const maxSize = config.WINSTON_LOG_MAX_SIZE;
-        const maxFiles = config.WINSTON_LOG_MAX_FILES;
-        const level = config.WINSTON_LOG_LEVEL;
-        const dirname = config.WINSTON_LOG_DIRNAME;
+        const {
+          winston: {
+            logDatePattern: datePattern,
+            logMaxSize: maxSize,
+            logMaxFiles: maxFiles,
+            logLevel: level,
+            logDirname: dirname,
+          },
+        } = getBaseConfig(configService);
 
         return {
           levels: winston.config.syslog.levels,
@@ -118,9 +121,11 @@ import { BookingModule } from './booking/booking.module';
     }),
     I18nModule.forRootAsync({
       useFactory: (configService: ConfigService) => {
-        const systemConfig = getSystemConfig(configService);
+        const {
+          i18n: { fallbackLanguage },
+        } = getBaseConfig(configService);
         return {
-          fallbackLanguage: systemConfig.FALLBACK_LANGUAGE,
+          fallbackLanguage,
           throwOnMissingKey: true,
           loaderOptions: {
             path: path.join(__dirname, '/i18n/'),

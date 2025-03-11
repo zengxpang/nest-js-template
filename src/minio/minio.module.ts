@@ -1,6 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { getSystemConfig } from '@/common';
+import { getBaseConfig } from '@/common';
 
 import * as Minio from 'minio';
 
@@ -12,13 +12,15 @@ import { MinioController } from './minio.controller';
     {
       provide: 'MINIO_CLIENT',
       useFactory(configService: ConfigService) {
-        const systemConfig = getSystemConfig(configService);
+        const {
+          minio: { endPoint, port, accessKey, secretKey },
+        } = getBaseConfig(configService);
         return new Minio.Client({
-          endPoint: systemConfig.MINIO_SERVER_ENDPOINT,
-          port: systemConfig.MINIO_SERVER_PORT,
+          endPoint,
+          port,
           useSSL: false,
-          accessKey: systemConfig.MINIO_SERVER_ACCESS_KEY,
-          secretKey: systemConfig.MINIO_SERVER_SECRET_KEY,
+          accessKey,
+          secretKey,
         });
       },
       inject: [ConfigService],

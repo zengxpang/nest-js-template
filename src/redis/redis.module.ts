@@ -2,7 +2,7 @@ import { Global, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RedisModule as BaseRedisModule } from '@nestjs-modules/ioredis';
 
-import { getSystemConfig } from '@/common';
+import { getBaseConfig } from '@/common';
 
 import { RedisService } from './redis.service';
 
@@ -10,10 +10,15 @@ import { RedisService } from './redis.service';
 @Module({
   imports: [
     BaseRedisModule.forRootAsync({
-      useFactory: (configService: ConfigService) => ({
-        type: 'single',
-        url: getSystemConfig(configService).REDIS_URL,
-      }),
+      useFactory: (configService: ConfigService) => {
+        const {
+          redis: { url },
+        } = getBaseConfig(configService);
+        return {
+          type: 'single',
+          url,
+        };
+      },
       inject: [ConfigService],
     }),
   ],

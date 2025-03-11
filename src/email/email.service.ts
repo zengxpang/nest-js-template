@@ -1,21 +1,23 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Transporter, createTransport } from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
-import { getSystemConfig } from '@/common';
+import { getBaseConfig } from '@/common';
 
 @Injectable()
 export class EmailService {
   transporter: Transporter;
 
   constructor(private readonly configService: ConfigService) {
-    const systemConfig = getSystemConfig(this.configService);
+    const {
+      nodeMailer: { host, port, secure, authUser, authPass },
+    } = getBaseConfig(this.configService);
     this.transporter = createTransport({
-      host: systemConfig.NODEMAILER_SERVER_HOST,
-      port: systemConfig.NODEMAILER_SERVER_PORT,
-      secure: systemConfig.NODEMAILER_SERVER_SECURE,
+      host,
+      port,
+      secure,
       auth: {
-        user: systemConfig.NODEMAILER_SERVER_AUTH_USER,
-        pass: systemConfig.NODEMAILER_SERVER_AUTH_PASS,
+        user: authUser,
+        pass: authPass,
       },
     });
   }
@@ -39,11 +41,13 @@ export class EmailService {
     html?: string;
   }): Promise<Record<string, string>> {
     const code = Math.random().toString().slice(-4);
-    const systemConfig = getSystemConfig(this.configService);
+    const {
+      nodeMailer: { authUser },
+    } = getBaseConfig(this.configService);
     const options = {
       from: {
         name: '会议室预定系统',
-        address: systemConfig.NODEMAILER_SERVER_AUTH_USER,
+        address: authUser,
       },
       to: email,
       subject,

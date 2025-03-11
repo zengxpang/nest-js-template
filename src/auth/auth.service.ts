@@ -12,7 +12,7 @@ import { compare } from 'bcrypt';
 import { I18nService } from 'nestjs-i18n';
 
 import { I18nTranslations } from '@/generated/i18n.generated';
-import { getSystemConfig } from '@/common';
+import { getBaseConfig } from '@/common';
 import { RedisService } from '@/redis/redis.service';
 import { UserService } from '@/user/user.service';
 import { UserInfoEntity } from '@/auth/entities/user-info.entity';
@@ -102,10 +102,9 @@ export class AuthService {
     );
     const signInErrors =
       await this.redisService.getSignInErrors(signInErrorsKey);
-    const systemConfig = getSystemConfig(this.configService);
-    const signInErrorsLimit = systemConfig.SIGN_IN_ERROR_LIMIT;
-    if (signInErrors >= signInErrorsLimit) {
-      const signInErrorsExpire = systemConfig.SIGN_IN_ERROR_EXPIRE_IN / 60;
+    const { signInError } = getBaseConfig(this.configService);
+    if (signInErrors >= signInError.limit) {
+      const signInErrorsExpire = signInError.expiresIn / 60;
       throw new BadRequestException(
         `登录错误次数过多，请${signInErrorsExpire}分钟后重试`,
       );
@@ -169,12 +168,14 @@ export class AuthService {
   }
 
   createTokens(payload: Auth.IPayload): Auth.IJwtSign {
-    const systemConfig = getSystemConfig(this.configService);
+    const {
+      jwt: { accessTokenExpiresIn, refreshTokenExpiresIn },
+    } = getBaseConfig(this.configService);
     const accessToken = this.jwtService.sign(payload, {
-      expiresIn: systemConfig.JWT_ACCESS_TOKEN_EXPIRES_IN,
+      expiresIn: accessTokenExpiresIn,
     });
     const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: systemConfig.JWT_REFRESH_TOKEN_EXPIRES_IN,
+      expiresIn: refreshTokenExpiresIn,
     });
     return {
       accessToken,

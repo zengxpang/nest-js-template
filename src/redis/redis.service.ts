@@ -3,7 +3,7 @@ import { InjectRedis } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
 import { createHash } from 'crypto';
 
-import { getSystemConfig } from '@/common';
+import { getBaseConfig } from '@/common';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -33,7 +33,7 @@ export class RedisService {
 
   setCaptcha(key: string, value: string, expiresIn?: number) {
     if (expiresIn === undefined) {
-      expiresIn = getSystemConfig(this.configService).CAPTCHA_EXPIRES_IN;
+      expiresIn = getBaseConfig(this.configService).captcha.expiresIn;
     }
     return this.redis.set(key, value, 'EX', expiresIn);
   }
@@ -51,9 +51,9 @@ export class RedisService {
   }
 
   setEmailCaptcha(email: string, captcha: string) {
-    const expiresIn = getSystemConfig(
-      this.configService,
-    ).EMAIL_CAPTCHA_EXPIRES_IN;
+    const {
+      captcha: { expiresIn },
+    } = getBaseConfig(this.configService);
     return this.redis.set(
       this.createEmailCaptchaKey(email),
       captcha,
@@ -75,9 +75,9 @@ export class RedisService {
   }
 
   setSignInErrors(key: string, value: number) {
-    const expiresIn = getSystemConfig(
-      this.configService,
-    ).SIGN_IN_ERROR_EXPIRE_IN;
+    const {
+      signInError: { expiresIn },
+    } = getBaseConfig(this.configService);
     return this.redis.set(key, value, 'EX', expiresIn);
   }
 
@@ -96,10 +96,10 @@ export class RedisService {
 
   setBlackList(token: string) {
     const key = this.createBlackListKey(token);
-    const expiresIn = getSystemConfig(
-      this.configService,
-    ).JWT_ACCESS_TOKEN_EXPIRES_IN;
-    this.redis.set(key, 'logout', 'EX', expiresIn);
+    const {
+      jwt: { accessTokenExpiresIn },
+    } = getBaseConfig(this.configService);
+    this.redis.set(key, 'logout', 'EX', accessTokenExpiresIn);
   }
 
   async isBlackListed(token: string) {
@@ -120,10 +120,10 @@ export class RedisService {
   setUserPermission(id: string, permissions: string[]) {
     const key = this.createUserPermissionKey(id);
     this.redis.sadd(key, permissions);
-    this.redis.expire(
-      key,
-      getSystemConfig(this.configService).JWT_ACCESS_TOKEN_EXPIRES_IN,
-    );
+    const {
+      jwt: { accessTokenExpiresIn },
+    } = getBaseConfig(this.configService);
+    this.redis.expire(key, accessTokenExpiresIn);
   }
 
   delUserPermission(id: string) {
