@@ -23,9 +23,7 @@ model User {
   updated_at DateTime @updatedAt
   profile    Profile?
 
-  roles             UserOnRole[]
-  bookings          Booking[]
-  booking_attendees BookingAttendee[] // 一个用户可以参加多个预定
+  roles UserOnRole[]
 
   @@map("user")
 }
@@ -129,60 +127,4 @@ model RoleOnPermission {
 
   @@id([role_id, permission_id])
   @@map("role_on_permission")
-}
-
-model Room {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique @db.VarChar(50)
-  description String   @db.VarChar(255)
-  capacity    Int
-  location    String   @db.VarChar(255)
-  equipment   String   @db.VarChar(255)
-  is_booked   Int?     @default(0)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
-  bookings Booking[]
-
-  @@map("room")
-}
-
-enum BookingStatus {
-  APPLYING
-  PASS
-  RELIEVE
-  DISMISSED
-}
-
-model Booking {
-  id         Int           @id @default(autoincrement())
-  start_time DateTime
-  end_time   DateTime
-  note       String?       @db.VarChar(255)
-  status     BookingStatus @default(APPLYING)
-  created_at DateTime      @default(now())
-  updated_at DateTime      @updatedAt
-
-  room    Room @relation(fields: [room_id], references: [id])
-  room_id Int
-
-  user    User   @relation(fields: [user_id], references: [id])
-  user_id String
-
-  booking_attendees BookingAttendee[] // 预定的参与人列表
-
-  @@map("booking")
-}
-
-model BookingAttendee {
-  bookings   Booking @relation(fields: [booking_id], references: [id])
-  booking_id Int
-
-  users   User   @relation(fields: [user_id], references: [id])
-  user_id String
-
-  join_at DateTime @default(now())
-
-  @@id([booking_id, user_id])
-  @@map("booking_attendee")
 }

@@ -91,46 +91,6 @@ CREATE TABLE `role_on_permission` (
     PRIMARY KEY (`role_id`, `permission_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
-CREATE TABLE `room` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(50) NOT NULL,
-    `description` VARCHAR(255) NOT NULL,
-    `capacity` INTEGER NOT NULL,
-    `location` VARCHAR(255) NOT NULL,
-    `equipment` VARCHAR(255) NOT NULL,
-    `is_booked` INTEGER NULL DEFAULT 0,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updated_at` DATETIME(3) NOT NULL,
-
-    UNIQUE INDEX `room_name_key`(`name`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `booking` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `start_time` DATETIME(3) NOT NULL,
-    `end_time` DATETIME(3) NOT NULL,
-    `note` VARCHAR(255) NULL,
-    `status` ENUM('APPLYING', 'PASS', 'RELIEVE', 'DISMISSED') NOT NULL DEFAULT 'APPLYING',
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updated_at` DATETIME(3) NOT NULL,
-    `room_id` INTEGER NOT NULL,
-    `user_id` VARCHAR(191) NOT NULL,
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `booking_attendee` (
-    `booking_id` INTEGER NOT NULL,
-    `user_id` VARCHAR(191) NOT NULL,
-    `join_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-
-    PRIMARY KEY (`booking_id`, `user_id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
 -- AddForeignKey
 ALTER TABLE `profile` ADD CONSTRAINT `profile_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -148,15 +108,3 @@ ALTER TABLE `role_on_permission` ADD CONSTRAINT `role_on_permission_permission_i
 
 -- AddForeignKey
 ALTER TABLE `role_on_permission` ADD CONSTRAINT `role_on_permission_role_id_fkey` FOREIGN KEY (`role_id`) REFERENCES `role`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `booking` ADD CONSTRAINT `booking_room_id_fkey` FOREIGN KEY (`room_id`) REFERENCES `room`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `booking` ADD CONSTRAINT `booking_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `booking_attendee` ADD CONSTRAINT `booking_attendee_booking_id_fkey` FOREIGN KEY (`booking_id`) REFERENCES `booking`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `booking_attendee` ADD CONSTRAINT `booking_attendee_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

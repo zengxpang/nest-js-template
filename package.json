@@ -23,7 +23,8 @@
     "migrate:deploy": "npx prisma migrate deploy",
     "prisma:generate": "npx prisma generate",
     "prisma:studio": "npx prisma studio",
-    "prisma:seed": "npx prisma db seed"
+    "prisma:seed": "npx prisma db seed",
+    "compodoc": "compodoc -p tsconfig.json -s -o -c .compodoc.json"
   },
   "dependencies": {
     "@nestjs-modules/ioredis": "^2.0.2",
@@ -58,6 +59,7 @@
     "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
+    "@compodoc/compodoc": "^1.1.26",
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",

@@ -33,7 +33,7 @@ async function bootstrap() {
   app.useLogger(winstonLogger);
 
   // static静态服务
-  // http://localhost:3000/static/${filename}
+  // http://localhost:4000/static/${filename}
   app.useStaticAssets('public', { prefix: '/static' });
 
   app.use(I18nMiddleware);
