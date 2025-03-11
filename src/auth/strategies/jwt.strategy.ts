@@ -4,7 +4,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
 
-import { getSystemConfig, JWT } from '@/common';
+import { getBaseConfig, JWT } from '@/common';
 import { RedisService } from '@/redis/redis.service';
 import { AuthService } from '@/auth/auth.service';
 
@@ -15,12 +15,14 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT) {
     private readonly redisService: RedisService,
     private readonly authService: AuthService,
   ) {
-    const systemConfig = getSystemConfig(configService);
+    const {
+      jwt: { accessSecret },
+    } = getBaseConfig(configService);
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       // 路由提供了一个过期的 JWT，请求将被拒绝，并发送一个 401 Unauthorized 响应
       ignoreExpiration: false,
-      secretOrKey: systemConfig.JWT_ACCESS_SECRET,
+      secretOrKey: accessSecret,
       passReqToCallback: true, // 设置为true，validate的第一个参数才是request
     });
   }

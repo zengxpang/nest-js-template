@@ -13,7 +13,7 @@ import {
   SwaggerModule,
 } from '@nestjs/swagger';
 
-import { AllExceptionFilter, getSystemConfig } from '@/common';
+import { AllExceptionFilter, getBaseConfig } from '@/common';
 
 import { AppModule } from './app.module';
 import metadata from './metadata';
@@ -24,10 +24,10 @@ async function bootstrap() {
   });
 
   const configService = app.get(ConfigService);
-  const systemConfig = getSystemConfig(configService);
+  const { app: appConfig, swagger } = getBaseConfig(configService);
   const winstonLogger = app.get(WINSTON_MODULE_NEST_PROVIDER);
   // 全局前缀
-  app.setGlobalPrefix(systemConfig.NEST_PREFIX);
+  app.setGlobalPrefix(appConfig.prefix);
 
   // winston
   app.useLogger(winstonLogger);
@@ -52,9 +52,7 @@ async function bootstrap() {
   );
 
   // swagger
-  const title = systemConfig.SWAGGER_TITLE;
-  const description = systemConfig.SWAGGER_DESCRIPTION;
-  const version = systemConfig.SWAGGER_VERSION;
+  const { title, description, version } = swagger;
   const swaggerConfig = new DocumentBuilder()
     .setTitle(title)
     .setDescription(description)
@@ -72,6 +70,6 @@ async function bootstrap() {
   });
 
   // nest
-  await app.listen(systemConfig.NEST_PORT);
+  await app.listen(appConfig.port);
 }
 bootstrap();

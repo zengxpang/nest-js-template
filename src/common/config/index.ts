@@ -1,126 +1,152 @@
 import { ConfigService } from '@nestjs/config';
 
-interface ISystemConfig {
-  NEST_PREFIX: string;
-  NEST_PORT: number;
+interface IBaseConfig {
+  app: {
+    prefix: string;
+    port: number;
+  };
+  winston: {
+    logLevel: string;
+    logDirname: string;
+    logMaxFiles: string;
+    logDatePattern: string;
+    logMaxSize: string;
+  };
+  nodeMailer: {
+    host: string;
+    port: number;
+    authUser: string;
+    authPass: string;
+    secure: boolean;
+  };
+  redis: {
+    port: number;
+    host: string;
+    url: string;
+  };
+  jwt: {
+    accessSecret: string;
+    refreshSecret: string;
+    accessTokenExpiresIn: number;
+    refreshTokenExpiresIn: string;
+  };
+  bcrypt: {
+    saltRounds: number;
+  };
+  builtIn: {
+    defaultAdminUsername: string;
+    defaultAdminPassword: string;
+    defaultAdminRole: string;
+    defaultUserUsername: string;
+    defaultUserPassword: string;
+    defaultUserRole: string;
+  };
+  swagger: {
+    title: string;
+    description: string;
+    version: string;
+  };
+  minio: {
+    endPoint: string;
+    port: number;
+    accessKey: string;
+    secretKey: string;
+  };
+  i18n: {
+    fallbackLanguage: string;
+  };
+  captcha: {
+    expiresIn: number;
+  };
 
-  DEFAULT_ADMIN_USERNAME: string;
-  DEFAULT_ADMIN_PASSWORD: string;
-  DEFAULT_ADMIN_ROLE: string;
-
-  SWAGGER_TITLE: string;
-  SWAGGER_DESCRIPTION: string;
-  SWAGGER_VERSION: string;
-
-  WINSTON_LOG_LEVEL: string;
-  WINSTON_LOG_DIRNAME: string;
-  WINSTON_LOG_MAX_FILES: string;
-  WINSTON_LOG_DATE_PATTERN: string;
-  WINSTON_LOG_MAX_SIZE: string;
-
-  JWT_ACCESS_SECRET: string;
-  JWT_REFRESH_SECRET: string;
-  JWT_ACCESS_TOKEN_EXPIRES_IN: number;
-  JWT_REFRESH_TOKEN_EXPIRES_IN: string;
-
-  REDIS_URL: string;
-
-  CAPTCHA_EXPIRES_IN: number;
-  SIGN_IN_ERROR_EXPIRE_IN: number;
-  SIGN_IN_ERROR_LIMIT: number;
-
-  FALLBACK_LANGUAGE: string;
-
-  EMAIL_CAPTCHA_EXPIRES_IN: number;
-
-  BCRYPT_SALT_ROUNDS: number;
-
-  NODEMAILER_SERVER_HOST: string;
-  NODEMAILER_SERVER_PORT: number;
-  NODEMAILER_SERVER_AUTH_USER: string;
-  NODEMAILER_SERVER_AUTH_PASS: string;
-  NODEMAILER_SERVER_SECURE: boolean;
-
-  MINIO_SERVER_ENDPOINT: string;
-  MINIO_SERVER_PORT: number;
-  MINIO_SERVER_ACCESS_KEY: string;
-  MINIO_SERVER_SECRET_KEY: string;
-  // todo
+  signInError: {
+    limit: number;
+    expiresIn: number;
+  };
 }
 
-export const getSystemConfig = (
+export const getBaseConfig = (
   configService: ConfigService,
-): Readonly<ISystemConfig> => {
+): Readonly<IBaseConfig> => {
   return {
-    NEST_PREFIX: configService.get<string>('NEST_PREFIX') || '/api/v1',
-    NEST_PORT: +configService.get<number>('NEST_PORT') || 3000,
-
-    DEFAULT_ADMIN_USERNAME:
-      configService.get<string>('DEFAULT_ADMIN_USERNAME') || 'admin',
-    DEFAULT_ADMIN_PASSWORD:
-      configService.get<string>('DEFAULT_ADMIN_PASSWORD') || '123456',
-    DEFAULT_ADMIN_ROLE:
-      configService.get<string>('DEFAULT_ADMIN_ROLE') || 'admin',
-
-    SWAGGER_TITLE: configService.get<string>('SWAGGER_TITLE') || 'NestJS',
-    SWAGGER_DESCRIPTION: configService.get<string>('SWAGGER_DESCRIPTION') || '',
-    SWAGGER_VERSION: configService.get<string>('SWAGGER_VERSION') || '1.0',
-
-    WINSTON_LOG_LEVEL: configService.get<string>('WINSTON_LOG_LEVEL') || 'info',
-    WINSTON_LOG_DIRNAME:
-      configService.get<string>('WINSTON_LOG_DIRNAME') || 'logs',
-    WINSTON_LOG_MAX_FILES:
-      configService.get<string>('WINSTON_LOG_MAX_FILES') || '14d',
-    WINSTON_LOG_DATE_PATTERN:
-      configService.get<string>('WINSTON_LOG_DATE_PATTERN') || 'YYYY-MM-DD',
-    WINSTON_LOG_MAX_SIZE:
-      configService.get<string>('WINSTON_LOG_MAX_SIZE') || '20m',
-
-    JWT_ACCESS_SECRET:
-      configService.get<string>('JWT_ACCESS_SECRET') || 'access zxp',
-    JWT_REFRESH_SECRET:
-      configService.get<string>('JWT_REFRESH_SECRET') || 'refresh zxp',
-    JWT_ACCESS_TOKEN_EXPIRES_IN:
-      +configService.get<number>('JWT_ACCESS_TOKEN_EXPIRES_IN') || 1800,
-    JWT_REFRESH_TOKEN_EXPIRES_IN:
-      configService.get<string>('JWT_REFRESH_TOKEN_EXPIRES_IN') || '7d',
-
-    REDIS_URL:
-      configService.get<string>('REDIS_URL') || 'redis://localhost:6379',
-
-    CAPTCHA_EXPIRES_IN: +configService.get<number>('CAPTCHA_EXPIRES_IN') || 300,
-    SIGN_IN_ERROR_EXPIRE_IN:
-      +configService.get<number>('SIGN_IN_ERROR_EXPIRE_IN') || 300,
-    SIGN_IN_ERROR_LIMIT: +configService.get<number>('SIGN_IN_ERROR_LIMIT') || 5,
-
-    FALLBACK_LANGUAGE: configService.get<string>('FALLBACK_LANGUAGE') || 'zh',
-
-    EMAIL_CAPTCHA_EXPIRES_IN:
-      +configService.get<number>('EMAIL_CAPTCHA_EXPIRES_IN') || 300,
-
-    BCRYPT_SALT_ROUNDS: +configService.get<number>('BCRYPT_SALT_ROUNDS') || 10,
-
-    NODEMAILER_SERVER_HOST:
-      configService.get<string>('NODEMAILER_SERVER_HOST') || 'smtp.qq.com',
-    NODEMAILER_SERVER_PORT:
-      +configService.get<number>('NODEMAILER_SERVER_PORT') || 465,
-    NODEMAILER_SERVER_AUTH_USER:
-      configService.get<string>('NODEMAILER_SERVER_AUTH_USER') ||
-      '2531069259@qq.com',
-    NODEMAILER_SERVER_AUTH_PASS:
-      configService.get<string>('NODEMAILER_SERVER_AUTH_PASS') ||
-      'zdhawcsqzjofdhgj',
-    NODEMAILER_SERVER_SECURE:
-      configService.get<boolean>('NODEMAILER_SERVER_SECURE') || false,
-
-    MINIO_SERVER_ENDPOINT:
-      configService.get<string>('MINIO_SERVER_ENDPOINT') || 'localhost',
-    MINIO_SERVER_PORT: +configService.get<number>('MINIO_SERVER_PORT') || 9000,
-    MINIO_SERVER_ACCESS_KEY:
-      configService.get<string>('MINIO_SERVER_ACCESS_KEY') ||
-      '5OpnF8rGg4C31iBk3LKw',
-    MINIO_SERVER_SECRET_KEY:
-      configService.get<string>('MINIO_SERVER_SECRET_KEY') ||
-      'fwTGO8jfyaiHqNKGtcnVcA62B6Kwo9dY0eL3dLqs',
+    app: {
+      prefix: configService.get<string>('NEST_PREFIX') || '/api/v1',
+      port: +configService.get<number>('NEST_PORT') || 4000,
+    },
+    winston: {
+      logLevel: configService.get<string>('WINSTON_LOG_LEVEL') || 'info',
+      logDirname: configService.get<string>('WINSTON_LOG_DIRNAME') || 'logs',
+      logMaxFiles: configService.get<string>('WINSTON_LOG_MAX_FILES') || '14d',
+      logDatePattern:
+        configService.get<string>('WINSTON_LOG_DATE_PATTERN') || 'YYYY-MM-DD',
+      logMaxSize: configService.get<string>('WINSTON_LOG_MAX_SIZE') || '20m',
+    },
+    nodeMailer: {
+      host:
+        configService.get<string>('NODEMAILER_SERVER_HOST') || 'smtp.qq.com',
+      port: +configService.get<number>('NODEMAILER_SERVER_PORT') || 465,
+      authUser:
+        configService.get<string>('NODEMAILER_SERVER_AUTH_USER') ||
+        '2531069259@qq.com',
+      authPass:
+        configService.get<string>('NODEMAILER_SERVER_AUTH_PASS') ||
+        'zdhawcsqzjofdhgj',
+      secure: configService.get<boolean>('NODEMAILER_SERVER_SECURE') ?? false,
+    },
+    redis: {
+      port: +configService.get<number>('REDIS_PORT') || 6379,
+      host: configService.get<string>('REDIS_HOST') || 'localhost',
+      url: configService.get<string>('REDIS_URL') || 'redis://localhost:6379',
+    },
+    jwt: {
+      accessSecret:
+        configService.get<string>('JWT_ACCESS_SECRET') || 'access zxp',
+      refreshSecret:
+        configService.get<string>('JWT_REFRESH_SECRET') || 'refresh zxp',
+      accessTokenExpiresIn:
+        +configService.get<number>('JWT_ACCESS_TOKEN_EXPIRES_IN') || 1800,
+      refreshTokenExpiresIn:
+        configService.get<string>('JWT_REFRESH_TOKEN_EXPIRES_IN') || '7d',
+    },
+    bcrypt: {
+      saltRounds: +configService.get<number>('BCRYPT_SALT_ROUNDS') || 10,
+    },
+    builtIn: {
+      defaultAdminUsername:
+        configService.get<string>('DEFAULT_ADMIN_USERNAME') || 'admin',
+      defaultAdminPassword:
+        configService.get<string>('DEFAULT_ADMIN_PASSWORD') || '123456',
+      defaultAdminRole:
+        configService.get<string>('DEFAULT_ADMIN_ROLE') || 'admin',
+      defaultUserUsername:
+        configService.get<string>('DEFAULT_USER_USERNAME') || 'user',
+      defaultUserPassword:
+        configService.get<string>('DEFAULT_USER_PASSWORD') || '123456',
+      defaultUserRole: configService.get<string>('DEFAULT_USER_ROLE') || 'user',
+    },
+    swagger: {
+      title: configService.get<string>('SWAGGER_TITLE') || 'NestJS',
+      description: configService.get<string>('SWAGGER_DESCRIPTION') || '',
+      version: configService.get<string>('SWAGGER_VERSION') || '1.0',
+    },
+    minio: {
+      endPoint: configService.get<string>('MINIO_END_POINT') || 'localhost',
+      port: +configService.get<number>('MINIO_PORT') || 9000,
+      accessKey:
+        configService.get<string>('MINIO_ACCESS_KEY') || '5OpnF8rGg4C31iBk3LKw',
+      secretKey:
+        configService.get<string>('MINIO_SECRET_KEY') ||
+        'fwTGO8jfyaiHqNKGtcnVcA62B6Kwo9dY0eL3dLqs',
+    },
+    i18n: {
+      fallbackLanguage: configService.get<string>('FALLBACK_LANGUAGE') || 'zh',
+    },
+    captcha: {
+      expiresIn: +configService.get<number>('CAPTCHA_EXPIRES_IN') || 300,
+    },
+    signInError: {
+      limit: +configService.get<number>('SIGN_IN_ERROR_LIMIT') || 5,
+      expiresIn: +configService.get<number>('SIGN_IN_ERROR_EXPIRES_IN') || 300,
+    },
   };
 };

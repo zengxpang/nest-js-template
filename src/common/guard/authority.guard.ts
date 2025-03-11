@@ -4,7 +4,7 @@ import { Request } from 'express';
 import { some, includes, isEmpty, size } from 'lodash';
 
 import { ConfigService } from '@nestjs/config';
-import { AUTHORITY, getSystemConfig } from '@/common';
+import { AUTHORITY, getBaseConfig } from '@/common';
 import { RedisService } from '@/redis/redis.service';
 import { PermissionService } from '@/permission/permission.service';
 
@@ -32,8 +32,10 @@ export class AuthorityGuard implements CanActivate {
     const user = request.user;
     const { username, userId } = user;
 
-    const { DEFAULT_ADMIN_USERNAME } = getSystemConfig(this.configService);
-    if (username === DEFAULT_ADMIN_USERNAME) {
+    const {
+      builtIn: { defaultAdminUsername },
+    } = getBaseConfig(this.configService);
+    if (username === defaultAdminUsername) {
       return true;
     }
 

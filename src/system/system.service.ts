@@ -5,7 +5,7 @@ import { map, omit } from 'lodash';
 import { hash } from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 
-import { getSystemConfig } from '@/common';
+import { getBaseConfig } from '@/common';
 
 import { RoleListDto } from './dto/role-list.dto';
 import { CreateRoleDto } from './dto/create-role.dto';
@@ -34,8 +34,10 @@ export class SystemService {
       description,
       roles,
     } = createUserDto;
-    const { BCRYPT_SALT_ROUNDS } = getSystemConfig(this.configService);
-    const newPassword = await hash(password, +BCRYPT_SALT_ROUNDS);
+    const {
+      bcrypt: { saltRounds },
+    } = getBaseConfig(this.configService);
+    const newPassword = await hash(password, +saltRounds);
 
     return await this.prismaService.client.user.create({
       data: {

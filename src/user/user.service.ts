@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CustomPrismaService } from 'nestjs-prisma';
 import { ExtendedPrismaClient } from '@/prisma/prisma.extension';
 import { UserPermissionInfoEntity } from '@/user/entities/user-permission-info.entity';
-import { getSystemConfig } from '@/common';
+import { getBaseConfig } from '@/common';
 import { ConfigService } from '@nestjs/config';
 import { hash } from 'bcrypt';
 import { isEmpty } from 'lodash';
@@ -44,8 +44,10 @@ export class UserService {
     password: string;
     email: string;
   }) {
-    const { BCRYPT_SALT_ROUNDS } = getSystemConfig(this.configService);
-    const newPassword = await hash(password, +BCRYPT_SALT_ROUNDS);
+    const {
+      bcrypt: { saltRounds },
+    } = getBaseConfig(this.configService);
+    const newPassword = await hash(password, +saltRounds);
     return await this.prismaService.client.user.upsert({
       create: {
         username,
